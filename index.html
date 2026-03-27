@@ -13,25 +13,19 @@ button{padding:8px 12px;border:none;border-radius:10px;background:#6366f1;color:
 .container{padding:16px}
 .calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
 @media(max-width:600px){.calendar{grid-template-columns:repeat(3,1fr)}}
-.day{background:#020617;border-radius:14px;padding:10px;min-height:110px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;position:relative;transition:.25s}
-.day:hover{transform:translateY(-4px) scale(1.02)}
+.day{background:#020617;border-radius:14px;padding:10px;min-height:110px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;transition:.25s}
 .today{border:2px solid #22d3ee;box-shadow:0 0 12px #22d3ee}
 .week{font-size:10px;color:#94a3b8}
 .date{font-weight:600}
-.status{font-size:11px;padding:4px 6px;border-radius:8px;margin-top:4px;text-align:center;transition:.4s}
+.status{font-size:11px;padding:4px;border-radius:8px;margin-top:4px;text-align:center}
 .available{background:#00ffa6;color:#000}
 .pending{background:#fb923c;color:#000}
 .partial{background:#facc15;color:#000}
-
-.day:hover .tooltip{opacity:1;transform:translateX(-50%) scale(1)}
-
-.tooltip-item.available{background:#00ffa6;color:#000}
-.tooltip-item.pending{background:#fb923c;color:#000}
-.tooltip-item.partial{background:#facc15;color:#000}
 .modal{position:fixed;top:0;left:0;width:100%;height:100%;display:none;justify-content:center;align-items:center;background:rgba(0,0,0,.7)}
-.modal-box{background:#020617;padding:18px;border-radius:14px;width:90%;max-width:380px}
+.modal-box{background:#020617;padding:18px;border-radius:14px;width:90%;max-width:380px;position:relative}
 .close{position:absolute;right:10px;top:10px;background:#ef4444;padding:4px 8px;border-radius:6px}
-input{width:100%;padding:10px;margin-bottom:10px;border:none;border-radius:8px;background:#1e293b;color:#fff}
+input,select{width:100%;padding:10px;margin-bottom:10px;border:none;border-radius:8px;background:#1e293b;color:#fff}
+.success{background:#22c55e;padding:10px;border-radius:10px;text-align:center}
 </style>
 </head>
 <body>
@@ -39,8 +33,8 @@ input{width:100%;padding:10px;margin-bottom:10px;border:none;border-radius:8px;b
 <div class="header">
   <div>📚 NTL Library Dashboard</div>
   <div class="header-right">
-    <div id="clock" style="font-size:13px"></div>
-    <div id="conn" style="font-size:12px;padding:4px 8px;border-radius:8px;background:#ef4444">Offline</div>
+    <div id="clock"></div>
+    <div id="conn" style="padding:4px 8px;border-radius:8px;background:#ef4444">Offline</div>
     <button onclick="openBooking()">📌 จอง</button>
     <button onclick="openLogin()">🔐 Admin</button>
   </div>
@@ -55,95 +49,53 @@ input{width:100%;padding:10px;margin-bottom:10px;border:none;border-radius:8px;b
   <button class="close" onclick="closeModal('bookingModal')">❌</button>
   <h3>📚 จองห้องสมุด</h3>
   <input id="date" type="date">
-  <input id="startTime" type="time">
-  <input id="stopTime" type="time">
-  <input id="subject" placeholder="รายละเอียด">
+  <select id="timeSlot">
+    <option value="08:00-12:00">เช้า (08:00 - 12:00)</option>
+    <option value="13:00-18:00">บ่าย (13:00 - 18:00)</option>
+    <option value="08:00-18:00">ทั้งวัน (08:00 - 18:00)</option>
+  </select>
+  <input id="meeting" placeholder="หัวข้อประชุม">
   <input id="userName" placeholder="ชื่อผู้จอง">
   <input id="phone" placeholder="เบอร์ติดต่อ">
   <button onclick="submitBooking()">บันทึก</button>
 </div></div>
 
-<!-- LOGIN -->
-<div id="loginModal" class="modal"><div class="modal-box">
-  <button class="close" onclick="closeModal('loginModal')">❌</button>
-  <h3>🔐 Admin Login</h3>
-  <input id="user" placeholder="กรอก Username">
-  <input id="pass" type="password" placeholder="กรอก Password">
-  <button onclick="login()">Login</button>
-</div></div>
-
-<!-- ADMIN -->
-<div id="adminModal" class="modal"><div class="modal-box">
-  <button class="close" onclick="closeModal('adminModal')">❌</button>
-  <h3>⚙️ จัดการรายการ</h3>
-  <div id="adminDetail"></div>
-  <button onclick="updateStatus('approved')">✔ Approve</button>
-  <button onclick="updateStatus('rejected')">❌ Reject</button>
-  <button onclick="updateStatus('cancel')">🚫 Cancel</button>
+<!-- SUCCESS -->
+<div id="successModal" class="modal"><div class="modal-box">
+  <div class="success">✅ บันทึกเสร็จสิ้นแล้ว</div>
 </div></div>
 
 <script>
-// 🔗 ===== CONFIG =====
-const GAS_URL = "https://script.google.com/macros/s/AKfycbx_Nop30QZjN6yMa8SzjhUrzMCaHD8qKqodsSumGlBv2dnEIWMsH8OYZZ-K9-k68GFh/exec"; // 👈 ใส่ URL จาก Apps Script
-
+const GAS_URL="https://script.google.com/macros/s/AKfycbx_Nop30QZjN6yMa8SzjhUrzMCaHD8qKqodsSumGlBv2dnEIWMsH8OYZZ-K9-k68GFh/exec";
 let data=[];
-let isAdmin=false;
-let currentIndex=null;
 
-const ADMINS=[
-  {u:'admin1',p:'1111'},
-  {u:'admin2',p:'2222'},
-  {u:'admin3',p:'2161'}
-];
-
-// 🕒 CLOCK
+// 🕒 Clock Thailand
 setInterval(()=>{
- const now=new Date();
- document.getElementById('clock').innerText=now.toLocaleTimeString('th-TH');
+ document.getElementById('clock').innerText=new Date().toLocaleTimeString('th-TH',{timeZone:'Asia/Bangkok'});
 },1000);
 
-// 🌐 CONNECTION
-function setConnection(status){
- const el=document.getElementById('conn');
- if(status){
-  el.innerText='Online';
-  el.style.background='#22c55e';
- }else{
-  el.innerText='Offline';
-  el.style.background='#ef4444';
- }
+function setConnection(s){
+ conn.innerText=s?'Online':'Offline';
+ conn.style.background=s?'#22c55e':'#ef4444';
 }
 
-// 📥 FETCH DATA
+function closeAll(){
+ document.querySelectorAll('.modal').forEach(m=>m.style.display='none');
+}
+
 async function fetchData(){
  try{
-  const res = await fetch(GAS_URL + '?t=' + Date.now()); // กัน cache
-  const raw = await res.json();
-
-  data = raw.map(r=>({
-    ID:r.ID,
-    Date:r.Date,
-    'Start Time':(r['Start Time']||'').toString().substring(0,5),
-    StopTime:(r.StopTime||'').toString().substring(0,5),
-    subject:r.Subject || '-',
-    user:r.User || '-',
-    phone:r.Phone || '-',
-    status:(r.Status || 'pending').toLowerCase()
-  }));
-
-  if(!res.ok) throw new Error('Network');
+  const res=await fetch(GAS_URL+'?t='+Date.now());
+  data=await res.json();
   setConnection(true);
   renderCalendar();
- }catch(e){
-  console.error(e);
-  setConnection(false);
- }
+ }catch(e){setConnection(false)}
 }
 
 function formatDate(d){
  if(d.includes('/')){
   const [day,month,year]=d.split('/');
-  return `${year}-${month}-${day}`;
+  return `${year}-${month.padStart(2,'0')}-${day.padStart(2,'0')}`;
  }
  return d;
 }
@@ -160,15 +112,13 @@ function renderCalendar(){
 
   const dayData=data.filter(x=>formatDate(x.Date)===dateStr);
 
-  const amData=dayData.find(x=>x['Start Time'] && x['Start Time']<'12:00');
-  const pmData=dayData.find(x=>x['Start Time'] && x['Start Time']>='12:00');
+  const am=dayData.find(x=>x['Start Time']==='08:00');
+  const pm=dayData.find(x=>x['Start Time']==='13:00');
 
-  const amCls=amData? (amData.status==='approved'?'partial':amData.status==='pending'?'pending':'available'):'available';
-  const pmCls=pmData? (pmData.status==='approved'?'partial':pmData.status==='pending'?'pending':'available'):'available';
+  const amCls=am?(am.Status==='Approved'?'partial':'pending'):'available';
+  const pmCls=pm?(pm.Status==='Approved'?'partial':'pending'):'available';
 
-  const today=(d.toDateString()===now.toDateString())?'today':'';
-
-  calendar.innerHTML+=`<div class="day ${today}" onclick="handleDayClick('${dateStr}')">
+  calendar.innerHTML+=`<div class="day">
     <div class="week">${d.toLocaleDateString('th-TH',{weekday:'short'})}</div>
     <div class="date">${d.getDate()}</div>
     <div class="status ${amCls}">เช้า</div>
@@ -177,102 +127,33 @@ function renderCalendar(){
  }
 }
 
-function handleDayClick(date){
- const list=data.filter(d=>formatDate(d.Date)===date);
- 
- let html='';
- if(list.length===0){ html='ไม่มีการจอง'; }
- else{
-  list.forEach(d=>{
-    html+=`<div style="margin-bottom:10px">
-      📅 ${d.Date}<br>
-      ⏰ ${d['Start Time']} - ${d.StopTime}<br>
-      📌 ${d.subject}<br>
-      👤 ${d.user}<br>
-      📞 ${d.phone}<br>
-      📊 ${d.status}
-      ${isAdmin?`<br><button onclick="openAdmin('${d.ID}')">⚙️ จัดการ</button>`:''}
-    </div>`;
-  });
- }
-
- document.getElementById('dayDetail')?.remove();
-
- const modal=document.createElement('div');
- modal.id='dayModal';
- modal.className='modal';
- modal.innerHTML=`<div class="modal-box">
-  <button class="close" onclick="closeModal('dayModal')">❌</button>
-  <h3>📅 รายละเอียด</h3>
-  <div id="dayDetail">${html}</div>
- </div>`;
- document.body.appendChild(modal);
- modal.style.display='flex';
-}
-
-function openAdmin(id){
- const i=data.findIndex(x=>x.ID===id);
- currentIndex=i;
- const d=data[i];
-
- adminDetail.innerHTML=`
-  <div>
-    📅 ${d.Date}<br>
-    ⏰ ${d['Start Time']} - ${d.StopTime}<br>
-    📌 ${d.subject}<br>
-    👤 ${d.user}<br>
-    📞 ${d.phone}<br>
-    📊 ${d.status}
-  </div>`;
-
- adminModal.style.display='flex';
-}
+function openBooking(){closeAll();bookingModal.style.display='flex'}
 
 async function submitBooking(){
+ closeAll();
+ const [start,stop]=timeSlot.value.split('-');
+
  await fetch(GAS_URL,{method:'POST',body:JSON.stringify({
   action:'create',
   data:{
     Date:new Date(date.value).toLocaleDateString('en-GB'),
-    'Start Time':startTime.value,
-    StopTime:stopTime.value,
-    subject:subject.value,
+    'Start Time':start,
+    StopTime:stop,
+    subject:meeting.value,
     user:userName.value,
     phone:phone.value
   }
  })});
 
- closeModal('bookingModal');
+ successModal.style.display='flex';
+ setTimeout(()=>closeModal('successModal'),1500);
  fetchData();
 }
 
-async function updateStatus(status){
- const d=data[currentIndex];
+function closeModal(id){document.getElementById(id).style.display='none'}
 
- await fetch(GAS_URL,{method:'POST',body:JSON.stringify({
-  action:'update',
-  data:{ID:d.ID},
-  status
- })});
-
- closeModal('adminModal');
- fetchData();
-}
-
-function openBooking(){bookingModal.style.display='flex'}
-function openLogin(){loginModal.style.display='flex'}
-
-function login(){
- const f=ADMINS.find(a=>a.u===user.value && a.p===pass.value);
- if(f){isAdmin=true;closeModal('loginModal');}
- else alert('ผิด');
-}
-
-function closeModal(id){document.getElementById(id)?.remove?.() || (document.getElementById(id).style.display='none');}
-
-// INIT
-renderCalendar(); // แสดงปฏิทินทันที (ไม่ต้องรอข้อมูล)
-fetchData(); // ดึงข้อมูลมาทับสถานะภายหลัง
+renderCalendar();
+fetchData();
 </script>
-
 </body>
 </html>
