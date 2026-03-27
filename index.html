@@ -13,8 +13,7 @@ button{padding:8px 12px;border:none;border-radius:10px;background:#6366f1;color:
 .container{padding:16px}
 .calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
 @media(max-width:600px){.calendar{grid-template-columns:repeat(3,1fr)}}
-.day{background:#020617;border-radius:14px;padding:10px;min-height:110px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;transition:.25s}
-.today{border:2px solid #22d3ee;box-shadow:0 0 12px #22d3ee}
+.day{background:#020617;border-radius:14px;padding:10px;min-height:110px;display:flex;flex-direction:column;justify-content:space-between}
 .week{font-size:10px;color:#94a3b8}
 .date{font-weight:600}
 .status{font-size:11px;padding:4px;border-radius:8px;margin-top:4px;text-align:center}
@@ -36,7 +35,6 @@ input,select{width:100%;padding:10px;margin-bottom:10px;border:none;border-radiu
     <div id="clock"></div>
     <div id="conn" style="padding:4px 8px;border-radius:8px;background:#ef4444">Offline</div>
     <button onclick="openBooking()">📌 จอง</button>
-    <button onclick="openLogin()">🔐 Admin</button>
   </div>
 </div>
 
@@ -44,7 +42,6 @@ input,select{width:100%;padding:10px;margin-bottom:10px;border:none;border-radiu
   <div id="calendar" class="calendar"></div>
 </div>
 
-<!-- BOOKING -->
 <div id="bookingModal" class="modal"><div class="modal-box">
   <button class="close" onclick="closeModal('bookingModal')">❌</button>
   <h3>📚 จองห้องสมุด</h3>
@@ -55,28 +52,32 @@ input,select{width:100%;padding:10px;margin-bottom:10px;border:none;border-radiu
     <option value="08:00-18:00">ทั้งวัน (08:00 - 18:00)</option>
   </select>
   <input id="meeting" placeholder="หัวข้อประชุม">
+  <input id="detail" placeholder="รายละเอียดการใช้งาน">
   <input id="userName" placeholder="ชื่อผู้จอง">
   <input id="phone" placeholder="เบอร์ติดต่อ">
   <button onclick="submitBooking()">บันทึก</button>
 </div></div>
 
-<!-- SUCCESS -->
 <div id="successModal" class="modal"><div class="modal-box">
   <div class="success">✅ บันทึกเสร็จสิ้นแล้ว</div>
 </div></div>
 
 <script>
-const GAS_URL="https://script.google.com/macros/s/AKfycbx_Nop30QZjN6yMa8SzjhUrzMCaHD8qKqodsSumGlBv2dnEIWMsH8OYZZ-K9-k68GFh/exec";
-let data=[];
+const GAS_URL = "https://script.google.com/macros/s/AKfycbx_Nop30QZjN6yMa8SzjhUrzMCaHD8qKqodsSumGlBv2dnEIWMsH8OYZZ-K9-k68GFh/exec";
+let data = [];
 
-// 🕒 Clock Thailand
+const calendar = document.getElementById('calendar');
+const conn = document.getElementById('conn');
+const bookingModal = document.getElementById('bookingModal');
+const successModal = document.getElementById('successModal');
+
 setInterval(()=>{
- document.getElementById('clock').innerText=new Date().toLocaleTimeString('th-TH',{timeZone:'Asia/Bangkok'});
+ document.getElementById('clock').innerText = new Date().toLocaleTimeString('th-TH',{timeZone:'Asia/Bangkok'});
 },1000);
 
 function setConnection(s){
- conn.innerText=s?'Online':'Offline';
- conn.style.background=s?'#22c55e':'#ef4444';
+ conn.innerText = s ? 'Online' : 'Offline';
+ conn.style.background = s ? '#22c55e' : '#ef4444';
 }
 
 function closeAll(){
@@ -85,19 +86,27 @@ function closeAll(){
 
 async function fetchData(){
  try{
-  const res=await fetch(GAS_URL+'?t='+Date.now());
-  data=await res.json();
+  const res = await fetch(GAS_URL + '?t=' + Date.now());
+  data = await res.json();
   setConnection(true);
   renderCalendar();
- }catch(e){setConnection(false)}
+ }catch(e){
+  setConnection(false);
+ }
 }
 
 function formatDate(d){
- if(d.includes('/')){
-  const [day,month,year]=d.split('/');
-  return `${year}-${month.padStart(2,'0')}-${day.padStart(2,'0')}`;
- }
- return d;
+ try{
+  if(typeof d === 'string'){
+    if(d.includes('/')){
+      const [day,month,year]=d.split('/');
+      return `${year}-${month.padStart(2,'0')}-${day.padStart(2,'0')}`;
+    }
+    if(d.includes('-')) return d;
+  }
+  const dt = new Date(d);
+  return dt.toISOString().split('T')[0];
+ }catch(e){ return ''; }
 }
 
 function renderCalendar(){
@@ -112,13 +121,13 @@ function renderCalendar(){
 
   const dayData=data.filter(x=>formatDate(x.Date)===dateStr);
 
-  const am=dayData.find(x=>x['Start Time']==='08:00');
-  const pm=dayData.find(x=>x['Start Time']==='13:00');
+  const am=dayData.find(x=>x['Start Time']?.toString().substring(0,5)==='08:00');
+  const pm=dayData.find(x=>x['Start Time']?.toString().substring(0,5)==='13:00');
 
-  const amCls=am?(am.Status==='Approved'?'partial':'pending'):'available';
-  const pmCls=pm?(pm.Status==='Approved'?'partial':'pending'):'available';
+  const amCls=am?(am.Status?.toLowerCase()==='approved'?'partial':'pending'):'available';
+  const pmCls=pm?(pm.Status?.toLowerCase()==='approved'?'partial':'pending'):'available';
 
-  calendar.innerHTML+=`<div class="day">
+  calendar.innerHTML += `<div class="day">
     <div class="week">${d.toLocaleDateString('th-TH',{weekday:'short'})}</div>
     <div class="date">${d.getDate()}</div>
     <div class="status ${amCls}">เช้า</div>
@@ -127,21 +136,22 @@ function renderCalendar(){
  }
 }
 
-function openBooking(){closeAll();bookingModal.style.display='flex'}
+function openBooking(){ closeAll(); bookingModal.style.display='flex'; }
 
 async function submitBooking(){
  closeAll();
- const [start,stop]=timeSlot.value.split('-');
+ const [start,stop]=document.getElementById('timeSlot').value.split('-');
 
  await fetch(GAS_URL,{method:'POST',body:JSON.stringify({
   action:'create',
   data:{
-    Date:new Date(date.value).toLocaleDateString('en-GB'),
+    Date:new Date(document.getElementById('date').value).toLocaleDateString('en-GB'),
     'Start Time':start,
     StopTime:stop,
-    subject:meeting.value,
-    user:userName.value,
-    phone:phone.value
+    subject:document.getElementById('meeting').value,
+    detail:document.getElementById('detail').value,
+    user:document.getElementById('userName').value,
+    phone:document.getElementById('phone').value
   }
  })});
 
@@ -150,7 +160,7 @@ async function submitBooking(){
  fetchData();
 }
 
-function closeModal(id){document.getElementById(id).style.display='none'}
+function closeModal(id){ document.getElementById(id).style.display='none'; }
 
 renderCalendar();
 fetchData();
