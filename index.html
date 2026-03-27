@@ -7,13 +7,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&family=IBM+Plex+Thai:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
 body{margin:0;font-family:'Kanit','IBM Plex Thai',sans-serif;background:radial-gradient(circle at top,#0b1220,#0f172a);color:#e2e8f0}
-.header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:linear-gradient(135deg,#22d3ee,#6366f1)}
-.header-right{display:flex;gap:8px;flex-wrap:wrap}
+.header{display:flex;flex-direction:column;gap:6px;padding:14px 16px;background:linear-gradient(135deg,#22d3ee,#6366f1)}
+.header-top{display:flex;justify-content:space-between;align-items:center}
+.title{font-size:18px;font-weight:600}
+.sub{font-size:12px;opacity:.8}
+.header-right{display:flex;gap:8px}
 button{padding:8px 12px;border:none;border-radius:10px;background:#6366f1;color:#fff;cursor:pointer}
 .container{padding:16px}
 .calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
-@media(max-width:600px){.calendar{grid-template-columns:repeat(3,1fr)}}
-.day{background:#020617;border-radius:14px;padding:10px;min-height:110px;display:flex;flex-direction:column;justify-content:space-between}
+.day{background:#020617;border-radius:14px;padding:10px;min-height:110px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer}
 .week{font-size:10px;color:#94a3b8}
 .date{font-weight:600}
 .status{font-size:11px;padding:4px;border-radius:8px;margin-top:4px;text-align:center}
@@ -24,146 +26,209 @@ button{padding:8px 12px;border:none;border-radius:10px;background:#6366f1;color:
 .modal-box{background:#020617;padding:18px;border-radius:14px;width:90%;max-width:380px;position:relative}
 .close{position:absolute;right:10px;top:10px;background:#ef4444;padding:4px 8px;border-radius:6px}
 input,select{width:100%;padding:10px;margin-bottom:10px;border:none;border-radius:8px;background:#1e293b;color:#fff}
-.success{background:#22c55e;padding:10px;border-radius:10px;text-align:center}
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div>📚 NTL Library Dashboard</div>
-  <div class="header-right">
-    <div id="clock"></div>
-    <div id="conn" style="padding:4px 8px;border-radius:8px;background:#ef4444">Offline</div>
-    <button onclick="openBooking()">📌 จอง</button>
+  <div class="header-top">
+    <div class="title">📊 ข้อมูลการใช้งานห้องสมุด</div>
+    <div class="header-right">
+      <div id="clock"></div>
+      <button onclick="openBooking()">📌 จอง</button>
+      <button onclick="openLogin()">🔐 Admin</button>
+    </div>
   </div>
+  <div id="monthLabel" class="sub"></div>
 </div>
 
 <div class="container">
   <div id="calendar" class="calendar"></div>
 </div>
 
+<!-- LOGIN -->
+<div id="loginModal" class="modal"><div class="modal-box">
+  <button class="close" onclick="closeModal('loginModal')">❌</button>
+  <h3>Admin Login</h3>
+  <input id="user" placeholder="Username">
+  <input id="pass" type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+</div></div>
+
+<!-- ADMIN -->
+<div id="adminModal" class="modal"><div class="modal-box">
+  <button class="close" onclick="closeModal('adminModal')">❌</button>
+  <div id="adminDetail"></div>
+  <button onclick="updateStatus('approved')">Approve</button>
+  <button onclick="updateStatus('rejected')">Reject</button>
+</div></div>
+
+<!-- BOOKING -->
 <div id="bookingModal" class="modal"><div class="modal-box">
   <button class="close" onclick="closeModal('bookingModal')">❌</button>
   <h3>📚 จองห้องสมุด</h3>
   <input id="date" type="date">
   <select id="timeSlot">
-    <option value="08:00-12:00">เช้า (08:00 - 12:00)</option>
-    <option value="13:00-18:00">บ่าย (13:00 - 18:00)</option>
-    <option value="08:00-18:00">ทั้งวัน (08:00 - 18:00)</option>
+    <option value="08:00-12:00">เช้า</option>
+    <option value="13:00-18:00">บ่าย</option>
+    <option value="08:00-18:00">ทั้งวัน</option>
   </select>
   <input id="meeting" placeholder="หัวข้อประชุม">
-  <input id="detail" placeholder="รายละเอียดการใช้งาน">
-  <input id="userName" placeholder="ชื่อผู้จอง">
-  <input id="phone" placeholder="เบอร์ติดต่อ">
+  <input id="detail" placeholder="รายละเอียด">
+  <input id="userName" placeholder="ชื่อ">
+  <input id="phone" placeholder="เบอร์">
   <button onclick="submitBooking()">บันทึก</button>
-</div></div>
-
-<div id="successModal" class="modal"><div class="modal-box">
-  <div class="success">✅ บันทึกเสร็จสิ้นแล้ว</div>
 </div></div>
 
 <script>
 const GAS_URL = "https://script.google.com/macros/s/AKfycbx_Nop30QZjN6yMa8SzjhUrzMCaHD8qKqodsSumGlBv2dnEIWMsH8OYZZ-K9-k68GFh/exec";
 let data = [];
+let isAdmin = false;
+let currentID = null;
 
-const calendar = document.getElementById('calendar');
-const conn = document.getElementById('conn');
-const bookingModal = document.getElementById('bookingModal');
-const successModal = document.getElementById('successModal');
+const ADMINS = [{u:'admin1',p:'1111'},{u:'admin2',p:'2222'}];
 
+// clock TH
 setInterval(()=>{
- document.getElementById('clock').innerText = new Date().toLocaleTimeString('th-TH',{timeZone:'Asia/Bangkok'});
+  document.getElementById('clock').innerText = new Date().toLocaleTimeString('th-TH',{timeZone:'Asia/Bangkok'});
 },1000);
 
-function setConnection(s){
- conn.innerText = s ? 'Online' : 'Offline';
- conn.style.background = s ? '#22c55e' : '#ef4444';
-}
-
-function closeAll(){
- document.querySelectorAll('.modal').forEach(m=>m.style.display='none');
+function formatDate(d){
+  try{
+    if(typeof d === 'string'){
+      if(d.includes('/')){
+        const [day,month,year]=d.split('/');
+        return `${year}-${month.padStart(2,'0')}-${day.padStart(2,'0')}`;
+      }
+      if(d.includes('-')) return d;
+    }
+    const dt = new Date(d);
+    return dt.toISOString().split('T')[0];
+  }catch(e){ return ''; }
 }
 
 async function fetchData(){
- try{
-  const res = await fetch(GAS_URL + '?t=' + Date.now());
-  data = await res.json();
-  setConnection(true);
-  renderCalendar();
- }catch(e){
-  setConnection(false);
- }
-}
-
-function formatDate(d){
- try{
-  if(typeof d === 'string'){
-    if(d.includes('/')){
-      const [day,month,year]=d.split('/');
-      return `${year}-${month.padStart(2,'0')}-${day.padStart(2,'0')}`;
-    }
-    if(d.includes('-')) return d;
+  try{
+    const res = await fetch(GAS_URL + '?t=' + Date.now());
+    data = await res.json();
+    renderCalendar();
+  }catch(e){
+    console.error(e);
   }
-  const dt = new Date(d);
-  return dt.toISOString().split('T')[0];
- }catch(e){ return ''; }
 }
 
 function renderCalendar(){
- calendar.innerHTML='';
- const now=new Date();
- const start=new Date(now.getFullYear(),now.getMonth(),1);
+  const cal = document.getElementById('calendar');
+  cal.innerHTML = '';
 
- for(let i=0;i<30;i++){
-  const d=new Date(start);
-  d.setDate(i+1);
-  const dateStr=d.toISOString().split('T')[0];
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  document.getElementById('monthLabel').innerText = now.toLocaleDateString('th-TH',{month:'long',year:'numeric'});
 
-  const dayData=data.filter(x=>formatDate(x.Date)===dateStr);
+  const days = new Date(year, month+1, 0).getDate();
 
-  const am=dayData.find(x=>x['Start Time']?.toString().substring(0,5)==='08:00');
-  const pm=dayData.find(x=>x['Start Time']?.toString().substring(0,5)==='13:00');
+  for(let i=1;i<=days;i++){
+    const d = new Date(year,month,i);
+    const dateStr = d.toISOString().split('T')[0];
 
-  const amCls=am?(am.Status?.toLowerCase()==='approved'?'partial':'pending'):'available';
-  const pmCls=pm?(pm.Status?.toLowerCase()==='approved'?'partial':'pending'):'available';
+    const dayData = data.filter(x=>formatDate(x.Date)===dateStr);
 
-  calendar.innerHTML += `<div class="day">
-    <div class="week">${d.toLocaleDateString('th-TH',{weekday:'short'})}</div>
-    <div class="date">${d.getDate()}</div>
-    <div class="status ${amCls}">เช้า</div>
-    <div class="status ${pmCls}">บ่าย</div>
-  </div>`;
- }
+    const am = dayData.find(x=>x['Start Time']?.toString().substring(0,5)==='08:00');
+    const pm = dayData.find(x=>x['Start Time']?.toString().substring(0,5)==='13:00');
+
+    const amCls = am ? (am.Status?.toLowerCase()==='approved'?'partial':'pending') : 'available';
+    const pmCls = pm ? (pm.Status?.toLowerCase()==='approved'?'partial':'pending') : 'available';
+
+    cal.innerHTML += `<div class="day" onclick="openDay('${dateStr}')">
+      <div class="week">${d.toLocaleDateString('th-TH',{weekday:'short'})}</div>
+      <div class="date">${i}</div>
+      <div class="status ${amCls}">เช้า</div>
+      <div class="status ${pmCls}">บ่าย</div>
+    </div>`;
+  }
 }
 
-function openBooking(){ closeAll(); bookingModal.style.display='flex'; }
+function openDay(date){
+  const list = data.filter(d=>formatDate(d.Date)===date);
+  if(list.length===0) return;
+
+  currentID = list[0].ID;
+  const d = list[0];
+
+  if(isAdmin){
+    document.getElementById('adminDetail').innerHTML = `${d.Subject || d.subject} | ${d.User || d.user}`;
+    document.getElementById('adminModal').style.display='flex';
+  }
+}
+
+function openLogin(){ document.getElementById('loginModal').style.display='flex'; }
+
+function login(){
+  const u = document.getElementById('user').value;
+  const p = document.getElementById('pass').value;
+  if(ADMINS.find(a=>a.u===u && a.p===p)){
+    isAdmin = true;
+    closeModal('loginModal');
+  } else {
+    alert('Invalid credentials');
+  }
+}
+
+async function updateStatus(status){
+  await fetch(GAS_URL,{method:'POST',body:JSON.stringify({action:'update',data:{ID:currentID},status})});
+  closeModal('adminModal');
+  await fetchData();
+}
+
+function openBooking(){ document.getElementById('bookingModal').style.display='flex'; }
 
 async function submitBooking(){
- closeAll();
- const [start,stop]=document.getElementById('timeSlot').value.split('-');
+  const selectedDate = new Date(document.getElementById('date').value).toISOString().split('T')[0];
+  const slot = document.getElementById('timeSlot').value;
+  const [start,stop] = slot.split('-');
 
- await fetch(GAS_URL,{method:'POST',body:JSON.stringify({
-  action:'create',
-  data:{
-    Date:new Date(document.getElementById('date').value).toLocaleDateString('en-GB'),
-    'Start Time':start,
-    StopTime:stop,
-    subject:document.getElementById('meeting').value,
-    detail:document.getElementById('detail').value,
-    user:document.getElementById('userName').value,
-    phone:document.getElementById('phone').value
+  // 🚫 กันจองซ้ำ
+  const sameDay = data.filter(x=>formatDate(x.Date)===selectedDate);
+
+  const isConflict = sameDay.some(x=>{
+    const s = x['Start Time']?.toString().substring(0,5);
+    const e = x.StopTime?.toString().substring(0,5);
+
+    if(slot==='08:00-18:00') return true;
+    if(slot==='08:00-12:00') return s==='08:00' || (s==='08:00' && e==='18:00');
+    if(slot==='13:00-18:00') return s==='13:00' || (s==='08:00' && e==='18:00');
+    return false;
+  });
+
+  if(isConflict){
+    alert('❌ ช่วงเวลานี้ถูกจองแล้ว');
+    return;
   }
- })});
 
- successModal.style.display='flex';
- setTimeout(()=>closeModal('successModal'),1500);
- fetchData();
+  await fetch(GAS_URL,{method:'POST',body:JSON.stringify({
+    action:'create',
+    data:{
+      Date:new Date(document.getElementById('date').value).toLocaleDateString('en-GB'),
+      'Start Time':start,
+      StopTime:stop,
+      subject:document.getElementById('meeting').value,
+      detail:document.getElementById('detail').value,
+      user:document.getElementById('userName').value,
+      phone:document.getElementById('phone').value
+    }
+  })});
+
+  closeModal('bookingModal');
+  await fetchData();
 }
 
 function closeModal(id){ document.getElementById(id).style.display='none'; }
 
+// init
 renderCalendar();
 fetchData();
+setInterval(fetchData,5000);
 </script>
 </body>
 </html>
