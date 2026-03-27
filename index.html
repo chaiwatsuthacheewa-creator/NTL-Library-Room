@@ -92,8 +92,8 @@ async function fetchData(){
     const res = await fetch(GAS_URL);
     const raw = await res.json();
 
-    // 🔥 แปลงข้อมูลจาก Google Sheet → ให้ตรงกับระบบ
     data = raw.map(r => ({
+      ID: r.ID,
       Date: r.Date,
       'Start Time': r['Start Time'],
       StopTime: r.StopTime,
@@ -107,9 +107,6 @@ async function fetchData(){
     renderAll();
   }catch(e){
     console.error(e);
-    setConnection(false);
-  }
-}catch(e){
     setConnection(false);
   }
 }
