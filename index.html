@@ -4,223 +4,273 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>NTL Library Room FL.16</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&family=IBM+Plex+Thai:wght@300;400;600&display=swap" rel="stylesheet">
-
 <style>
-body{margin:0;font-family:'Kanit','IBM Plex Thai',sans-serif;background:radial-gradient(circle,#0b1220,#0f172a);color:#e2e8f0}
-.header{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;background:linear-gradient(135deg,#22d3ee,#6366f1)}
-.clock{font-size:14px}
-.status-conn{font-size:12px;padding:4px 10px;border-radius:999px;background:#ef4444}
-.status-conn.online{background:#22c55e}
-.container{display:grid;gap:20px;padding:20px}
-@media(min-width:768px){.container{grid-template-columns:1fr 1fr}}
-@media(min-width:1200px){.container{grid-template-columns:2fr 1fr}}
-.card{background:rgba(255,255,255,0.05);border-radius:16px;padding:16px}
+body{margin:0;font-family:'Kanit','IBM Plex Thai',sans-serif;background:radial-gradient(circle at top,#0b1220,#0f172a);color:#e2e8f0}
+.header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:linear-gradient(135deg,#22d3ee,#6366f1)}
+.header-right{display:flex;gap:8px;flex-wrap:wrap}
+button{padding:8px 12px;border:none;border-radius:10px;background:#6366f1;color:#fff;cursor:pointer}
+.container{padding:16px}
 .calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
-.day{background:#020617;border-radius:12px;padding:10px;cursor:pointer}
+@media(max-width:600px){.calendar{grid-template-columns:repeat(3,1fr)}}
+.day{background:#020617;border-radius:14px;padding:10px;min-height:110px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;position:relative;transition:.25s}
+.day:hover{transform:translateY(-4px) scale(1.02)}
 .today{border:2px solid #22d3ee;box-shadow:0 0 12px #22d3ee}
-.status{font-size:11px;margin-top:4px;padding:3px 6px;border-radius:8px}
+.week{font-size:10px;color:#94a3b8}
+.date{font-weight:600}
+.status{font-size:11px;padding:4px 6px;border-radius:8px;margin-top:4px;text-align:center;transition:.4s}
 .available{background:#00ffa6;color:#000}
+.pending{background:#fb923c;color:#000}
 .partial{background:#facc15;color:#000}
-.table{width:100%;border-collapse:collapse}
-.table th,.table td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.1)}
-.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);display:none;justify-content:center;align-items:center}
-.modal-content{background:#020617;padding:20px;border-radius:16px;width:90%;max-width:420px;position:relative}
-.close-btn{position:absolute;top:10px;right:10px;background:#ef4444;color:#fff;border:none;border-radius:8px;padding:4px 8px}
-input{width:100%;padding:10px;margin-bottom:10px;border-radius:8px;border:none;background:#1e293b;color:#fff}
-button{padding:10px;border:none;border-radius:10px;background:#6366f1;color:#fff;cursor:pointer}
+
+.day:hover .tooltip{opacity:1;transform:translateX(-50%) scale(1)}
+
+.tooltip-item.available{background:#00ffa6;color:#000}
+.tooltip-item.pending{background:#fb923c;color:#000}
+.tooltip-item.partial{background:#facc15;color:#000}
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;display:none;justify-content:center;align-items:center;background:rgba(0,0,0,.7)}
+.modal-box{background:#020617;padding:18px;border-radius:14px;width:90%;max-width:380px}
+.close{position:absolute;right:10px;top:10px;background:#ef4444;padding:4px 8px;border-radius:6px}
+input{width:100%;padding:10px;margin-bottom:10px;border:none;border-radius:8px;background:#1e293b;color:#fff}
 </style>
 </head>
-
 <body>
 
 <div class="header">
   <div>📚 NTL Library Dashboard</div>
-  <div id="clock"></div>
-  <span id="conn" class="status-conn">Offline</span>
-  <button onclick="openBooking()">📌 จองห้องสมุด</button>
-  <button onclick="openLogin()">🔐 Admin</button>
+  <div class="header-right">
+    <div id="clock" style="font-size:13px"></div>
+    <div id="conn" style="font-size:12px;padding:4px 8px;border-radius:8px;background:#ef4444">Offline</div>
+    <button onclick="openBooking()">📌 จอง</button>
+    <button onclick="openLogin()">🔐 Admin</button>
+  </div>
 </div>
 
 <div class="container">
-<div class="card">
-  <div id="monthTitle"></div>
   <div id="calendar" class="calendar"></div>
 </div>
 
-<div class="card">
-  <h3>📋 รายละเอียดการจองทั้งหมด</h3>
-  <table class="table">
-    <thead>
-      <tr>
-        <th>วันที่</th>
-        <th>เวลา</th>
-        <th>รายละเอียด</th>
-        <th>สถานะ</th>
-      </tr>
-    </thead>
-    <tbody id="bookingList"></tbody>
-  </table>
-</div>
-</div>
+<!-- BOOKING -->
+<div id="bookingModal" class="modal"><div class="modal-box">
+  <button class="close" onclick="closeModal('bookingModal')">❌</button>
+  <h3>📚 จองห้องสมุด</h3>
+  <input id="date" type="date">
+  <input id="startTime" type="time">
+  <input id="stopTime" type="time">
+  <input id="subject" placeholder="รายละเอียด">
+  <input id="userName" placeholder="ชื่อผู้จอง">
+  <input id="phone" placeholder="เบอร์ติดต่อ">
+  <button onclick="submitBooking()">บันทึก</button>
+</div></div>
 
-<!-- MODALS (เหมือนเดิม) -->
-<div class="modal" id="adminActionModal"><div class="modal-content"><button class="close-btn" onclick="closeModal('adminActionModal')">❌</button><h3>⚙️ จัดการ</h3><div id="adminDetail"></div><button onclick="doApprove()">✔</button><button onclick="doReject()">❌</button><button onclick="doCancel()">🚫</button></div></div>
-<div class="modal" id="loginModal"><div class="modal-content"><button class="close-btn" onclick="closeModal('loginModal')">❌</button><h3>🔐 Login</h3><input id="adminUser"><input id="adminPass" type="password"><button onclick="login()">Login</button></div></div>
-<div class="modal" id="bookingModal"><div class="modal-content"><button class="close-btn" onclick="closeModal('bookingModal')">❌</button><h3>📚 จอง</h3><input type="date" id="date"><input type="time" id="startTime"><input type="time" id="stopTime"><input id="subject"><input id="user"><input id="phone"><button onclick="submitBooking()">บันทึก</button></div></div>
+<!-- LOGIN -->
+<div id="loginModal" class="modal"><div class="modal-box">
+  <button class="close" onclick="closeModal('loginModal')">❌</button>
+  <h3>🔐 Admin Login</h3>
+  <input id="user" placeholder="กรอก Username">
+  <input id="pass" type="password" placeholder="กรอก Password">
+  <button onclick="login()">Login</button>
+</div></div>
+
+<!-- ADMIN -->
+<div id="adminModal" class="modal"><div class="modal-box">
+  <button class="close" onclick="closeModal('adminModal')">❌</button>
+  <h3>⚙️ จัดการรายการ</h3>
+  <div id="adminDetail"></div>
+  <button onclick="updateStatus('approved')">✔ Approve</button>
+  <button onclick="updateStatus('rejected')">❌ Reject</button>
+  <button onclick="updateStatus('cancel')">🚫 Cancel</button>
+</div></div>
 
 <script>
-// ===== CONFIG =====
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxXRAV_6VP9soB_09cW_GjK4N3l0ckP5MrOtifF07D_Svsk6GzsAtYryO0SifEN8L4v/exec";
+// 🔗 ===== CONFIG =====
+const GAS_URL = "PUT_YOUR_GAS_URL_HERE"; // 👈 ใส่ URL จาก Apps Script
+
 let data=[];
 let isAdmin=false;
 let currentIndex=null;
 
 const ADMINS=[
-  {user:'admin1',pass:'1111'},
-  {user:'admin2',pass:'2222'},
-  {user:'admin3',pass:'3333'}
+  {u:'admin1',p:'1111'},
+  {u:'admin2',p:'2222'},
+  {u:'admin3',p:'2161'}
 ];
 
-// ===== CLOCK =====
-setInterval(()=>clock.innerText=new Date().toLocaleTimeString('th-TH'),1000);
+// 🕒 CLOCK
+setInterval(()=>{
+ const now=new Date();
+ document.getElementById('clock').innerText=now.toLocaleTimeString('th-TH');
+},1000);
 
-// ===== FETCH DATA =====
-async function fetchData(){
-  try{
-    const res = await fetch(GAS_URL);
-    const raw = await res.json();
-
-    data = raw.map(r => ({
-      ID: r.ID,
-      Date: r.Date,
-      'Start Time': r['Start Time'],
-      StopTime: r.StopTime,
-      subject: r.Subject || r.Detail || '-',
-      user: r.User || '-',
-      phone: r.Phone || '',
-      status: r.Status || 'pending'
-    }));
-
-    setConnection(true);
-    renderAll();
-  }catch(e){
-    console.error(e);
-    setConnection(false);
-  }
+// 🌐 CONNECTION
+function setConnection(status){
+ const el=document.getElementById('conn');
+ if(status){
+  el.innerText='Online';
+  el.style.background='#22c55e';
+ }else{
+  el.innerText='Offline';
+  el.style.background='#ef4444';
+ }
 }
 
-function setConnection(s){
-  conn.innerText=s?'Online':'Offline';
-  conn.classList.toggle('online',s);
+// 📥 FETCH DATA
+async function fetchData(){
+ try{
+  const res = await fetch(GAS_URL);
+  const raw = await res.json();
+
+  data = raw.map(r=>({
+    ID:r.ID,
+    Date:r.Date,
+    'Start Time':(r['Start Time']||'').toString().substring(0,5),
+    StopTime:(r.StopTime||'').toString().substring(0,5),
+    subject:r.Subject || '-',
+    user:r.User || '-',
+    phone:r.Phone || '-',
+    status:r.Status || 'pending'
+  }));
+
+  setConnection(true);
+  renderCalendar();
+ }catch(e){
+  console.error(e);
+  setConnection(false);
+ }
 }
 
 function formatDate(d){
-  if(d.includes('/')){
-    const [day,month,year]=d.split('/');
-    return `${year}-${month}-${day}`;
-  }
-  return d;
+ if(d.includes('/')){
+  const [day,month,year]=d.split('/');
+  return `${year}-${month}-${day}`;
+ }
+ return d;
 }
 
-// ===== CALENDAR (แสดงเฉพาะ approved) =====
 function renderCalendar(){
-  calendar.innerHTML='';
-  const now=new Date();
-  const start=new Date(now.getFullYear(),now.getMonth(),1);
+ calendar.innerHTML='';
+ const now=new Date();
+ const start=new Date(now.getFullYear(),now.getMonth(),1);
 
-  monthTitle.innerText=`📊 ข้อมูลการใช้งานห้องสมุด ประจำเดือน ${start.toLocaleString('th-TH',{month:'long',year:'numeric'})}`;
+ for(let i=0;i<30;i++){
+  const d=new Date(start);
+  d.setDate(i+1);
+  const dateStr=d.toISOString().split('T')[0];
 
-  for(let i=0;i<30;i++){
-    const d=new Date(start);
-    d.setDate(start.getDate()+i);
-    const dateStr=d.toISOString().split('T')[0];
+  const dayData=data.filter(x=>formatDate(x.Date)===dateStr);
 
-    const dayData=data.filter(x=>formatDate(x.Date)===dateStr && x.status==='approved');
+  const amData=dayData.find(x=>x['Start Time'] && x['Start Time']<'12:00');
+  const pmData=dayData.find(x=>x['Start Time'] && x['Start Time']>='12:00');
 
-    const am=dayData.find(x=>x['Start Time']<'12:00');
-    const pm=dayData.find(x=>x['Start Time']>='12:00');
+  const amCls=amData? (amData.status==='approved'?'partial':amData.status==='pending'?'pending':'available'):'available';
+  const pmCls=pmData? (pmData.status==='approved'?'partial':pmData.status==='pending'?'pending':'available'):'available';
 
-    calendar.innerHTML+=`<div class='day'>
-      ${d.getDate()}
-      <div class='status ${am?'partial':'available'}'>เช้า</div>
-      <div class='status ${pm?'partial':'available'}'>บ่าย</div>
+  const today=(d.toDateString()===now.toDateString())?'today':'';
+
+  calendar.innerHTML+=`<div class="day ${today}" onclick="handleDayClick('${dateStr}')">
+    <div class="week">${d.toLocaleDateString('th-TH',{weekday:'short'})}</div>
+    <div class="date">${d.getDate()}</div>
+    <div class="status ${amCls}">เช้า</div>
+    <div class="status ${pmCls}">บ่าย</div>
+  </div>`;
+ }
+}
+
+function handleDayClick(date){
+ const list=data.filter(d=>formatDate(d.Date)===date);
+ 
+ let html='';
+ if(list.length===0){ html='ไม่มีการจอง'; }
+ else{
+  list.forEach(d=>{
+    html+=`<div style="margin-bottom:10px">
+      📅 ${d.Date}<br>
+      ⏰ ${d['Start Time']} - ${d.StopTime}<br>
+      📌 ${d.subject}<br>
+      👤 ${d.user}<br>
+      📞 ${d.phone}<br>
+      📊 ${d.status}
+      ${isAdmin?`<br><button onclick="openAdmin('${d.ID}')">⚙️ จัดการ</button>`:''}
     </div>`;
-  }
-}
-
-// ===== LIST =====
-function renderList(){
-  bookingList.innerHTML='';
-  data.forEach((d,i)=>{
-    const btn=isAdmin?`<button onclick="openAdmin(${i})">⚙️</button>`:'';
-    bookingList.innerHTML+=`<tr>
-      <td>${d.Date}</td>
-      <td>${d['Start Time']}-${d.StopTime}</td>
-      <td>${d.subject}</td>
-      <td>${d.status} ${btn}</td>
-    </tr>`;
   });
+ }
+
+ document.getElementById('dayDetail')?.remove();
+
+ const modal=document.createElement('div');
+ modal.id='dayModal';
+ modal.className='modal';
+ modal.innerHTML=`<div class="modal-box">
+  <button class="close" onclick="closeModal('dayModal')">❌</button>
+  <h3>📅 รายละเอียด</h3>
+  <div id="dayDetail">${html}</div>
+ </div>`;
+ document.body.appendChild(modal);
+ modal.style.display='flex';
 }
 
-// ===== ADMIN =====
-function openAdmin(i){
-  currentIndex=i;
-  adminActionModal.style.display='flex';
+function openAdmin(id){
+ const i=data.findIndex(x=>x.ID===id);
+ currentIndex=i;
+ const d=data[i];
+
+ adminDetail.innerHTML=`
+  <div>
+    📅 ${d.Date}<br>
+    ⏰ ${d['Start Time']} - ${d.StopTime}<br>
+    📌 ${d.subject}<br>
+    👤 ${d.user}<br>
+    📞 ${d.phone}<br>
+    📊 ${d.status}
+  </div>`;
+
+ adminModal.style.display='flex';
+}
+
+async function submitBooking(){
+ await fetch(GAS_URL,{method:'POST',body:JSON.stringify({
+  action:'create',
+  data:{
+    Date:new Date(date.value).toLocaleDateString('en-GB'),
+    'Start Time':startTime.value,
+    StopTime:stopTime.value,
+    subject:subject.value,
+    user:userName.value,
+    phone:phone.value
+  }
+ })});
+
+ closeModal('bookingModal');
+ fetchData();
 }
 
 async function updateStatus(status){
-  const d=data[currentIndex];
+ const d=data[currentIndex];
 
-  await fetch(GAS_URL,{
-    method:'POST',
-    body:JSON.stringify({action:'update',data:d,status})
-  });
+ await fetch(GAS_URL,{method:'POST',body:JSON.stringify({
+  action:'update',
+  data:{ID:d.ID},
+  status
+ })});
 
-  fetchData();
-  closeModal('adminActionModal');
+ closeModal('adminModal');
+ fetchData();
 }
 
-function doApprove(){updateStatus('approved');}
-function doReject(){updateStatus('rejected');}
-function doCancel(){updateStatus('cancel');}
-
-// ===== LOGIN =====
-function openLogin(){loginModal.style.display='flex'}
-function login(){
-  const f=ADMINS.find(a=>a.user===adminUser.value && a.pass===adminPass.value);
-  if(f){isAdmin=true;closeModal('loginModal');renderAll();}
-  else alert('ผิด');
-}
-
-// ===== BOOKING =====
 function openBooking(){bookingModal.style.display='flex'}
+function openLogin(){loginModal.style.display='flex'}
 
-async function submitBooking(){
-  const payload={
-    action:'create',
-    data:{
-      Date:new Date(date.value).toLocaleDateString('en-GB'),
-      'Start Time':startTime.value,
-      StopTime:stopTime.value,
-      subject:subject.value,
-      user:user.value,
-      phone:phone.value,
-      status:'pending'
-    }
-  };
-
-  await fetch(GAS_URL,{method:'POST',body:JSON.stringify(payload)});
-  closeModal('bookingModal');
-  fetchData();
+function login(){
+ const f=ADMINS.find(a=>a.u===user.value && a.p===pass.value);
+ if(f){isAdmin=true;closeModal('loginModal');}
+ else alert('ผิด');
 }
 
-function closeModal(id){document.getElementById(id).style.display='none'}
+function closeModal(id){document.getElementById(id)?.remove?.() || (document.getElementById(id).style.display='none');}
 
-function renderAll(){renderCalendar();renderList();}
-
-fetchData();
+// INIT
+renderCalendar(); // แสดงปฏิทินทันที (ไม่ต้องรอข้อมูล)
+fetchData(); // ดึงข้อมูลมาทับสถานะภายหลัง
 </script>
 
 </body>
