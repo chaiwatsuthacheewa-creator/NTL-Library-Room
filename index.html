@@ -84,7 +84,7 @@ input{width:100%;padding:10px;margin-bottom:10px;border:none;border-radius:8px;b
 
 <script>
 // 🔗 ===== CONFIG =====
-const GAS_URL = "PUT_YOUR_GAS_URL_HERE"; // 👈 ใส่ URL จาก Apps Script
+const GAS_URL = "https://script.google.com/macros/s/AKfycbx_Nop30QZjN6yMa8SzjhUrzMCaHD8qKqodsSumGlBv2dnEIWMsH8OYZZ-K9-k68GFh/exec"; // 👈 ใส่ URL จาก Apps Script
 
 let data=[];
 let isAdmin=false;
@@ -117,7 +117,7 @@ function setConnection(status){
 // 📥 FETCH DATA
 async function fetchData(){
  try{
-  const res = await fetch(GAS_URL);
+  const res = await fetch(GAS_URL + '?t=' + Date.now()); // กัน cache
   const raw = await res.json();
 
   data = raw.map(r=>({
@@ -128,9 +128,10 @@ async function fetchData(){
     subject:r.Subject || '-',
     user:r.User || '-',
     phone:r.Phone || '-',
-    status:r.Status || 'pending'
+    status:(r.Status || 'pending').toLowerCase()
   }));
 
+  if(!res.ok) throw new Error('Network');
   setConnection(true);
   renderCalendar();
  }catch(e){
