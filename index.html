@@ -5,29 +5,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>NTL Library Room FL.16</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&family=IBM+Plex+Thai:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
-body{margin:0;font-family:'Kanit';background:linear-gradient(135deg,#1e293b,#312e81);color:#e2e8f0}
-.header{background:linear-gradient(135deg,#6366f1,#22d3ee);padding:16px 20px;display:flex;justify-content:space-between}
-.connection{font-size:12px;padding:4px 10px;border-radius:999px;background:#fca5a5}
-.connected{background:#86efac}
-.container{padding:20px;display:grid;gap:20px}
-.card{background:rgba(255,255,255,0.08);border-radius:20px;padding:18px}
-.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:12px}
-.day{background:rgba(255,255,255,0.06);border-radius:16px;padding:12px;min-height:120px}
-.today{border:2px solid #67e8f9}
-.status{display:inline-block;padding:4px 8px;border-radius:12px;font-size:11px;margin-top:4px}
-.full{background:#fca5a5}
-.available{background:#bbf7d0}
-button{padding:8px 10px;border:none;border-radius:10px;background:#818cf8;color:#fff}
-.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);display:none;justify-content:center;align-items:center}
-.modal-content{background:#1e293b;padding:20px;border-radius:16px;width:90%;max-width:400px}
-.close-btn{position:absolute;top:10px;right:10px}
-input,select,textarea{width:100%;padding:10px;margin-bottom:10px;border-radius:10px;border:none;background:#0f172a;color:#fff}
+body{margin:0;font-family:'Kanit','IBM Plex Thai',sans-serif;background:radial-gradient(circle,#0b1220,#0f172a);color:#e2e8f0}
+.header{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;background:linear-gradient(135deg,#22d3ee,#6366f1)}
+.clock{font-size:14px}
+.status-conn{font-size:12px;padding:4px 10px;border-radius:999px;background:#ef4444}
+.status-conn.online{background:#22c55e}
+.container{display:grid;gap:20px;padding:20px}
+@media(min-width:768px){.container{grid-template-columns:1fr 1fr}}
+@media(min-width:1200px){.container{grid-template-columns:2fr 1fr}}
+.card{background:rgba(255,255,255,0.05);border-radius:16px;padding:16px}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+.day{background:#020617;border-radius:12px;padding:10px;cursor:pointer}
+.today{border:2px solid #22d3ee;box-shadow:0 0 12px #22d3ee}
+.status{font-size:11px;margin-top:4px;padding:3px 6px;border-radius:8px}
+.available{background:#00ffa6;color:#000}
+.partial{background:#facc15;color:#000}
 .table{width:100%;border-collapse:collapse}
-.table td,.table th{padding:8px;border-bottom:1px solid rgba(255,255,255,0.1)}
+.table th,.table td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.1)}
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);display:none;justify-content:center;align-items:center}
+.modal-content{background:#020617;padding:20px;border-radius:16px;width:90%;max-width:420px;position:relative}
+.close-btn{position:absolute;top:10px;right:10px;background:#ef4444;color:#fff;border:none;border-radius:8px;padding:4px 8px}
+input{width:100%;padding:10px;margin-bottom:10px;border-radius:8px;border:none;background:#1e293b;color:#fff}
+button{padding:10px;border:none;border-radius:10px;background:#6366f1;color:#fff;cursor:pointer}
 </style>
 </head>
 
@@ -35,179 +37,193 @@ input,select,textarea{width:100%;padding:10px;margin-bottom:10px;border-radius:1
 
 <div class="header">
   <div>📚 NTL Library Dashboard</div>
-  <span id="conn" class="connection">Offline</span>
+  <div id="clock"></div>
+  <span id="conn" class="status-conn">Offline</span>
+  <button onclick="openBooking()">📌 จองห้องสมุด</button>
+  <button onclick="openLogin()">🔐 Admin</button>
 </div>
 
 <div class="container">
-
 <div class="card">
   <div id="monthTitle"></div>
   <div id="calendar" class="calendar"></div>
 </div>
 
 <div class="card">
-  <button onclick="openBooking()">จองห้อง</button>
-</div>
-
-<div class="card">
-  <canvas id="usageChart"></canvas>
-</div>
-
-<div class="card">
+  <h3>📋 รายละเอียดการจองทั้งหมด</h3>
   <table class="table">
     <thead>
       <tr>
-        <th>Date</th>
-        <th>Time</th>
-        <th>Subject</th>
-        <th>User</th>
+        <th>วันที่</th>
+        <th>เวลา</th>
+        <th>รายละเอียด</th>
+        <th>สถานะ</th>
       </tr>
     </thead>
     <tbody id="bookingList"></tbody>
   </table>
 </div>
-
 </div>
 
-<div class="modal" id="bookingModal">
-  <div class="modal-content">
-    <button class="close-btn" onclick="closeModal('bookingModal')">❌</button>
-
-    <!-- Date -->
-    <input type="date" id="date">
-
-    <!-- Start Time -->
-    <input type="time" id="startTime">
-
-    <!-- Stop Time -->
-    <input type="time" id="stopTime">
-
-    <!-- Subject -->
-    <input id="subject" placeholder="Subject">
-
-    <!-- Detail -->
-    <textarea id="detail" placeholder="Detail"></textarea>
-
-    <!-- User -->
-    <input id="user" placeholder="User">
-
-    <button onclick="submitBooking()">บันทึก</button>
-  </div>
-</div>
+<!-- MODALS (เหมือนเดิม) -->
+<div class="modal" id="adminActionModal"><div class="modal-content"><button class="close-btn" onclick="closeModal('adminActionModal')">❌</button><h3>⚙️ จัดการ</h3><div id="adminDetail"></div><button onclick="doApprove()">✔</button><button onclick="doReject()">❌</button><button onclick="doCancel()">🚫</button></div></div>
+<div class="modal" id="loginModal"><div class="modal-content"><button class="close-btn" onclick="closeModal('loginModal')">❌</button><h3>🔐 Login</h3><input id="adminUser"><input id="adminPass" type="password"><button onclick="login()">Login</button></div></div>
+<div class="modal" id="bookingModal"><div class="modal-content"><button class="close-btn" onclick="closeModal('bookingModal')">❌</button><h3>📚 จอง</h3><input type="date" id="date"><input type="time" id="startTime"><input type="time" id="stopTime"><input id="subject"><input id="user"><input id="phone"><button onclick="submitBooking()">บันทึก</button></div></div>
 
 <script>
-/* ===== CONFIG ===== */
-let GAS_URL="https://script.google.com/macros/s/AKfycbygxGQFKzGd8yJcd7j4DLFCNzAZjyNY3FIJGXradQWGHQT5uUVDRP0SFqHnZSH8-Pt8/exec";
+// ===== CONFIG =====
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxWulY_wZZ6YoWJhtKGTpqcgK7jB1QKFYpJPQFm-voYwcdCqNRa0C4Evso0RKoCw1c/exec";
 let data=[];
-let chart;
+let isAdmin=false;
+let currentIndex=null;
 
-/* ===== FETCH DATA FROM GOOGLE SHEET ===== */
+const ADMINS=[
+  {user:'admin1',pass:'1111'},
+  {user:'admin2',pass:'2222'},
+  {user:'admin3',pass:'3333'}
+];
+
+// ===== CLOCK =====
+setInterval(()=>clock.innerText=new Date().toLocaleTimeString('th-TH'),1000);
+
+// ===== FETCH DATA =====
 async function fetchData(){
   try{
-    const res=await fetch(GAS_URL);
-    data=await res.json();
+    const res = await fetch(GAS_URL);
+    const raw = await res.json();
 
-    document.getElementById('conn').innerText='Online';
-    document.getElementById('conn').classList.add('connected');
+    // 🔥 แปลงข้อมูลจาก Google Sheet → ให้ตรงกับระบบ
+    data = raw.map(r => ({
+      Date: r.Date,
+      'Start Time': r['Start Time'],
+      StopTime: r.StopTime,
+      subject: r.Subject || r.Detail || '-',
+      user: r.User || '-',
+      phone: r.Phone || '',
+      status: r.Status || 'pending'
+    }));
 
+    setConnection(true);
     renderAll();
   }catch(e){
-    document.getElementById('conn').innerText='Offline';
+    console.error(e);
+    setConnection(false);
+  }
+}catch(e){
+    setConnection(false);
   }
 }
 
-/* ===== CALENDAR ===== */
-function renderCalendar(){
-  const cal=document.getElementById('calendar');
-  cal.innerHTML='';
+function setConnection(s){
+  conn.innerText=s?'Online':'Offline';
+  conn.classList.toggle('online',s);
+}
 
+function formatDate(d){
+  if(d.includes('/')){
+    const [day,month,year]=d.split('/');
+    return `${year}-${month}-${day}`;
+  }
+  return d;
+}
+
+// ===== CALENDAR (แสดงเฉพาะ approved) =====
+function renderCalendar(){
+  calendar.innerHTML='';
   const now=new Date();
   const start=new Date(now.getFullYear(),now.getMonth(),1);
 
-  document.getElementById('monthTitle').innerText=
-    start.toLocaleString('th-TH',{month:'long',year:'numeric'});
+  monthTitle.innerText=`📊 ข้อมูลการใช้งานห้องสมุด ประจำเดือน ${start.toLocaleString('th-TH',{month:'long',year:'numeric'})}`;
 
   for(let i=0;i<30;i++){
     const d=new Date(start);
     d.setDate(start.getDate()+i);
-
     const dateStr=d.toISOString().split('T')[0];
 
-    // ⚠️ เปลี่ยนให้ตรง Google Sheet (Date)
-    const dayData=data.filter(x=>x["Date"]===dateStr);
+    const dayData=data.filter(x=>formatDate(x.Date)===dateStr && x.status==='approved');
 
-    let html='';
+    const am=dayData.find(x=>x['Start Time']<'12:00');
+    const pm=dayData.find(x=>x['Start Time']>='12:00');
 
-    if(dayData.length===0){
-      html="<div class='status available'>ว่าง</div>";
-    }else{
-      html="<div class='status full'>มีจอง</div>";
-    }
-
-    cal.innerHTML+=`<div class='day'>${d.getDate()}${html}</div>`;
+    calendar.innerHTML+=`<div class='day'>
+      ${d.getDate()}
+      <div class='status ${am?'partial':'available'}'>เช้า</div>
+      <div class='status ${pm?'partial':'available'}'>บ่าย</div>
+    </div>`;
   }
 }
 
-/* ===== CHART ===== */
-function renderChart(){
-  const days=[...Array(30)].map((_,i)=>i+1);
-
-  const usage=days.map(d=>
-    data.filter(x=>x["Date"].endsWith(String(d).padStart(2,'0'))).length
-  );
-
-  if(chart) chart.destroy();
-
-  chart=new Chart(document.getElementById('usageChart'),{
-    type:'line',
-    data:{labels:days,datasets:[{data:usage}]}
-  });
-}
-
-/* ===== LIST ===== */
+// ===== LIST =====
 function renderList(){
-  const el=document.getElementById('bookingList');
-  el.innerHTML='';
-
-  data.forEach(d=>{
-    el.innerHTML+=`
-      <tr>
-        <td>${d["Date"]}</td>
-        <td>${d["Start Time"]} - ${d["StopTime"]}</td>
-        <td>${d["Subject"]}</td>
-        <td>${d["User"]}</td>
-      </tr>`;
+  bookingList.innerHTML='';
+  data.forEach((d,i)=>{
+    const btn=isAdmin?`<button onclick="openAdmin(${i})">⚙️</button>`:'';
+    bookingList.innerHTML+=`<tr>
+      <td>${d.Date}</td>
+      <td>${d['Start Time']}-${d.StopTime}</td>
+      <td>${d.subject}</td>
+      <td>${d.status} ${btn}</td>
+    </tr>`;
   });
 }
 
-/* ===== SUBMIT BOOKING TO GOOGLE SHEET ===== */
-function submitBooking(){
-  fetch(GAS_URL,{
+// ===== ADMIN =====
+function openAdmin(i){
+  currentIndex=i;
+  adminActionModal.style.display='flex';
+}
+
+async function updateStatus(status){
+  const d=data[currentIndex];
+
+  await fetch(GAS_URL,{
     method:'POST',
-    body:JSON.stringify({
-      action:'create',
-      date:date.value,
-      startTime:startTime.value,
-      stopTime:stopTime.value,
-      subject:subject.value,
-      detail:detail.value,
-      user:user.value
-    })
+    body:JSON.stringify({action:'update',data:d,status})
   });
 
-  closeModal('bookingModal');
-  setTimeout(fetchData,500);
+  fetchData();
+  closeModal('adminActionModal');
 }
 
-/* ===== UI CONTROL ===== */
-function openBooking(){document.getElementById('bookingModal').style.display='flex'}
+function doApprove(){updateStatus('approved');}
+function doReject(){updateStatus('rejected');}
+function doCancel(){updateStatus('cancel');}
+
+// ===== LOGIN =====
+function openLogin(){loginModal.style.display='flex'}
+function login(){
+  const f=ADMINS.find(a=>a.user===adminUser.value && a.pass===adminPass.value);
+  if(f){isAdmin=true;closeModal('loginModal');renderAll();}
+  else alert('ผิด');
+}
+
+// ===== BOOKING =====
+function openBooking(){bookingModal.style.display='flex'}
+
+async function submitBooking(){
+  const payload={
+    action:'create',
+    data:{
+      Date:new Date(date.value).toLocaleDateString('en-GB'),
+      'Start Time':startTime.value,
+      StopTime:stopTime.value,
+      subject:subject.value,
+      user:user.value,
+      phone:phone.value,
+      status:'pending'
+    }
+  };
+
+  await fetch(GAS_URL,{method:'POST',body:JSON.stringify(payload)});
+  closeModal('bookingModal');
+  fetchData();
+}
+
 function closeModal(id){document.getElementById(id).style.display='none'}
 
-/* ===== INIT ===== */
-fetchData();
-setInterval(fetchData,5000);
+function renderAll(){renderCalendar();renderList();}
 
-function renderAll(){renderCalendar();renderList();renderChart();}
+fetchData();
 </script>
 
 </body>
