@@ -47,7 +47,6 @@
         
         .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; }
         
-        /* 💡 แถบอธิบายสถานะ (Status Legend) */
         .status-legend {
             display: flex; gap: 15px; align-items: center; flex-wrap: wrap;
             padding: 8px 15px; background: rgba(0,0,0,0.25); 
@@ -90,8 +89,9 @@
         .btn-outline { background: transparent; color: var(--text-main); border: 1px solid rgba(255,255,255,0.2); }
         .btn-outline:hover { background: rgba(255,255,255,0.05); }
 
-        input, select { width: 100%; padding: 14px 15px; margin: 8px 0 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.4); color: #fff; font-family: 'Kanit'; font-size: 15px; box-sizing: border-box; transition: 0.3s; outline: none; -webkit-appearance: none; appearance: none; }
-        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2); background: rgba(0,0,0,0.6); }
+        input, select, textarea { width: 100%; padding: 14px 15px; margin: 8px 0 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.4); color: #fff; font-family: 'Kanit'; font-size: 15px; box-sizing: border-box; transition: 0.3s; outline: none; -webkit-appearance: none; appearance: none; }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2); background: rgba(0,0,0,0.6); }
+        textarea { resize: vertical; min-height: 80px; }
         
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 1000; opacity: 0; transition: opacity 0.3s; padding: 20px; }
         .modal.show { display: flex; opacity: 1; }
@@ -172,7 +172,7 @@
     <div class="header-actions">
         <div id="clock">00:00:00</div>
         
-        <button class="btn btn-outline" onclick="goToMainMenu()" style="border-color: #10b981; color: #10b981; flex: 1; max-width: max-content;">
+        <button id="homeBtn" class="btn btn-outline" onclick="goToMainMenu()" style="display: none; border-color: #10b981; color: #10b981; flex: 1; max-width: max-content;">
             <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg> หน้าหลัก
         </button>
         
@@ -224,12 +224,16 @@
         </select>
         <label style="color:var(--text-muted); font-size: 13px;">หัวข้อการใช้งาน:</label>
         <input type="text" id="formSubject" placeholder="เช่น ประชุมโปรเจกต์ AWS">
+        
+        <label style="color:var(--text-muted); font-size: 13px;">รายละเอียดเพิ่มเติม:</label>
+        <textarea id="formDetail" placeholder="ระบุรายละเอียดเพิ่มเติม (ถ้ามี)"></textarea>
+
         <label style="color:var(--text-muted); font-size: 13px;">ผู้จอง / ทีม:</label>
         <input type="text" id="formUser" placeholder="ชื่อ หรือ รหัสพนักงาน">
         <label style="color:var(--text-muted); font-size: 13px;">เบอร์โทรติดต่อ:</label>
         <input type="tel" id="formPhone" placeholder="เบอร์โทร หรือ Ext.">
         
-        <div style="display: flex; gap: 12px; margin-top: 25px;">
+        <div style="display: flex; gap: 12px; margin-top: 15px;">
             <button class="btn btn-outline" style="flex: 1;" onclick="closeModal('bookingModal')">ยกเลิก</button>
             <button class="btn btn-primary" style="flex: 2;" onclick="submitBooking()" id="submitBtn">ยืนยันบันทึก</button>
         </div>
@@ -267,7 +271,7 @@
     
     function goToMainMenu() {
         if (isAdmin) {
-            const MAIN_MENU_URL = "https://add00917-hue.github.io/GNR3-Building-MS/"; 
+            const MAIN_MENU_URL = "https://add00917-hue.github.io/GNR3-Building-MS/"; // <--- ใส่ลิงก์ตรงนี้
             window.location.href = MAIN_MENU_URL;
         } else {
             showToast("⚠️ เฉพาะ Admin เท่านั้นที่สามารถเข้าหน้าเมนูหลักได้", "warning");
@@ -434,6 +438,10 @@
                                  : b.Status === 'pending' ? '<span style="color:var(--color-pending);">รอตรวจสอบ</span>' 
                                  : `<span style="color:var(--text-muted); text-decoration: line-through;">ยกเลิกแล้ว</span>`;
                 
+                const detailHtml = (b.Detail && b.Detail !== "-" && b.Detail.trim() !== "") 
+                    ? `<div style="color:#cbd5e1; font-size:13px; margin-bottom:8px; background: rgba(0,0,0,0.2); padding: 8px 10px; border-radius: 6px; border-left: 3px solid var(--primary);">📝 ${b.Detail}</div>` 
+                    : '';
+
                 let adminBtns = '';
                 if (isAdmin) {
                     adminBtns = `
@@ -451,6 +459,7 @@
                             <span style="font-size:14px">${statusText}</span>
                         </div>
                         <div style="color:#fff; font-size: 16px; font-weight:500; margin-bottom:6px;">${b.Subject}</div>
+                        ${detailHtml}
                         <div style="color:var(--text-muted); font-size:13px;">👤 ${b.User} | 📞 ${(b.Phone||"").replace(/'/g,'')}</div>
                         ${adminBtns}
                     </div>
@@ -470,7 +479,16 @@
         if (slot === 'afternoon') { st = "13:00"; ed = "18:00"; }
         else if (slot === 'fullday') { st = "08:00"; ed = "18:00"; }
 
-        const data = { action: 'create', Date: document.getElementById('formDate').value, startTime: st, stopTime: ed, subject: document.getElementById('formSubject').value, detail: "-", user: document.getElementById('formUser').value, phone: document.getElementById('formPhone').value };
+        const data = { 
+            action: 'create', 
+            Date: document.getElementById('formDate').value, 
+            startTime: st, 
+            stopTime: ed, 
+            subject: document.getElementById('formSubject').value, 
+            detail: document.getElementById('formDetail').value || "-", 
+            user: document.getElementById('formUser').value, 
+            phone: document.getElementById('formPhone').value 
+        };
 
         if (!data.Date || !data.subject || !data.user) { showToast("โปรดกรอกข้อมูลสำคัญให้ครบถ้วน", "warning"); return; }
         btn.innerText = "กำลังบันทึก..."; btn.disabled = true;
@@ -484,7 +502,12 @@
             const result = await res.json();
             
             if (result.status === 'error') { showToast(result.msg, "error"); } 
-            else { showToast("✅ บันทึกข้อมูลเสร็จแล้ว!", "success"); closeModal('bookingModal'); fetchData(); }
+            else { 
+                showToast("✅ บันทึกข้อมูลเสร็จแล้ว!", "success"); 
+                document.getElementById('formDetail').value = '';
+                closeModal('bookingModal'); 
+                fetchData(); 
+            }
         } catch (e) { showToast("Error: ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้", "error"); } 
         finally { btn.innerText = "ยืนยันบันทึก"; btn.disabled = false; }
     }
@@ -512,10 +535,10 @@
             document.getElementById('adminBtn').style.color = "var(--primary)";
             document.getElementById('adminBtnText').innerText = "DASHBOARD";
             
-            const homeBtn = document.querySelector('button[onclick="goToMainMenu()"]');
+            // 💡 โชว์ปุ่ม "หน้าหลัก" เมื่อแอดมินล็อกอินสำเร็จ
+            const homeBtn = document.getElementById('homeBtn');
             if(homeBtn) {
-                homeBtn.style.borderColor = "var(--primary)";
-                homeBtn.style.color = "var(--primary)";
+                homeBtn.style.display = "inline-flex";
             }
             
             handleAdminClick();
@@ -533,10 +556,10 @@
         document.getElementById('adminBtn').style.color = "var(--text-main)";
         document.getElementById('adminBtnText').innerText = "ADMIN";
         
-        const homeBtn = document.querySelector('button[onclick="goToMainMenu()"]');
+        // 💡 ซ่อนปุ่ม "หน้าหลัก" เมื่อแอดมินล็อกเอาต์
+        const homeBtn = document.getElementById('homeBtn');
         if(homeBtn) {
-            homeBtn.style.borderColor = "#10b981";
-            homeBtn.style.color = "#10b981";
+            homeBtn.style.display = "none";
         }
         
         renderCalendar();
@@ -555,12 +578,18 @@
         container.innerHTML = '';
         pending.sort((a,b) => new Date(a.Date) - new Date(b.Date)).forEach(b => {
             const dateFmt = b.Date ? b.Date.split('T')[0] : 'ไม่ระบุวันที่';
+            
+            const detailHtml = (b.Detail && b.Detail !== "-" && b.Detail.trim() !== "") 
+                ? `<div style="color:#cbd5e1; font-size:13px; margin-bottom:8px; background: rgba(0,0,0,0.2); padding: 8px 10px; border-radius: 6px; border-left: 3px solid var(--primary);">📝 ${b.Detail}</div>` 
+                : '';
+
             container.innerHTML += `
                 <div class="detail-item pending" style="margin-bottom: 15px;">
                     <div class="detail-meta">
                         <strong style="color:var(--primary); font-size:15px;">📅 ${dateFmt} | ⏰ ${b['Start Time']} - ${b.StopTime}</strong>
                     </div>
-                    <div style="color:#fff; font-size:16px; font-weight:500; margin-bottom:4px;">${b.Subject}</div>
+                    <div style="color:#fff; font-size:16px; font-weight:500; margin-bottom:6px;">${b.Subject}</div>
+                    ${detailHtml}
                     <div style="color:var(--text-muted); font-size:13px;">👤 ผู้จอง: ${b.User} | 📞 ${(b.Phone||"").replace(/'/g,'')}</div>
                     
                     <div class="admin-action-btns" style="margin-top: 15px; display:flex; gap:10px;">
