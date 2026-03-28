@@ -1,170 +1,200 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>NTL Library Room FL.16</title>
-<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
-<style>
-body{margin:0;font-family:'Kanit',sans-serif;background:#0f172a;color:#e2e8f0}
-.header{padding:14px;background:linear-gradient(135deg,#22d3ee,#6366f1)}
-.title{font-size:20px;color:#000;font-weight:600}
-.contact{font-size:12px;color:#000}
-.top{display:flex;justify-content:space-between;align-items:center}
-.right{display:flex;gap:8px}
-button{padding:8px;border:none;border-radius:8px;background:#6366f1;color:#fff;cursor:pointer}
-.conn{padding:4px 8px;border-radius:8px;background:#ef4444}
-.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;padding:10px}
-.day{background:#020617;padding:8px;border-radius:10px}
-.status{padding:4px;border-radius:6px;text-align:center}
-.available{background:#00ffa6;color:#000}
-.partial{background:#facc15;color:#000}
-.modal{position:fixed;top:0;left:0;width:100%;height:100%;display:none;justify-content:center;align-items:center;background:rgba(0,0,0,.7)}
-.box{background:#020617;padding:16px;border-radius:10px;width:300px}
-input{width:100%;padding:8px;margin-bottom:8px;border:none;border-radius:6px;background:#1e293b;color:#fff}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NTL Library Room FL.16</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #6366f1; --accent: #22d3ee; --bg: #0f172a; --card: #1e293b; }
+        body { margin: 0; font-family: 'Kanit', sans-serif; background: var(--bg); color: #f1f5f9; }
+        
+        /* Header & Stats */
+        .header { padding: 2rem; background: linear-gradient(135deg, var(--primary), var(--accent)); color: #000; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .top { display: flex; justify-content: space-between; align-items: center; }
+        .title { font-size: 24px; font-weight: 600; margin: 0; }
+        .contact-bar { font-size: 14px; opacity: 0.8; margin-top: 5px; }
+        
+        /* Calendar Grid */
+        .calendar-container { padding: 20px; max-width: 1200px; margin: auto; }
+        .calendar { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+        .day-card { background: var(--card); padding: 15px; border-radius: 12px; transition: 0.3s; cursor: pointer; border: 1px solid #334155; position: relative; }
+        .day-card:hover { transform: translateY(-5px); border-color: var(--accent); }
+        .day-num { font-size: 20px; font-weight: 600; }
+        
+        /* Status Tags */
+        .status-tag { margin-top: 10px; padding: 4px 8px; border-radius: 6px; font-size: 12px; text-align: center; font-weight: 500; }
+        .status-free { background: #059669; color: white; }
+        .status-busy { background: #e11d48; color: white; }
+        .status-pending { background: #ca8a04; color: white; }
+
+        /* Modal Customization */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); z-index: 100; }
+        .modal-content { background: var(--card); padding: 25px; border-radius: 16px; width: 90%; max-width: 400px; border: 1px solid #475569; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: white; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; border-radius: 8px; border: none; background: var(--primary); color: white; font-weight: 600; cursor: pointer; margin-top: 10px; }
+        .btn-close { background: #475569; }
+        .btn-approve { background: #059669; }
+        .btn-reject { background: #e11d48; }
+
+        .nav-btn { padding: 8px 16px; border-radius: 8px; background: rgba(255,255,255,0.2); color: black; border: 1px solid rgba(0,0,0,0.1); cursor: pointer; font-weight: 600; }
+    </style>
 </head>
 <body>
 
 <div class="header">
-<div class="top">
-<div>
-<div class="title">📊 ข้อมูลการใช้งานห้องสมุด</div>
-<div class="contact">Mail : BSCS_GNR | Tel : 3262-3264</div>
-</div>
-<div class="right">
-<div id="clock"></div>
-<div id="conn" class="conn">Offline</div>
-<button onclick="openBooking()">จอง</button>
-<button onclick="openLogin()">Admin</button>
-</div>
-</div>
-<div id="monthLabel"></div>
+    <div class="top">
+        <div>
+            <h1 class="title">📊 NTL Library FL.16</h1>
+            <div class="contact-bar">📧 BSCS_GNR | 📞 3262-3264</div>
+        </div>
+        <div style="text-align: right;">
+            <div id="clock" style="font-weight: 600; margin-bottom: 8px;">00:00:00</div>
+            <button class="nav-btn" onclick="openBooking()">➕ จองห้อง</button>
+            <button class="nav-btn" onclick="toggleAdmin()">🛡️ Admin</button>
+        </div>
+    </div>
+    <h3 id="monthLabel" style="margin-top: 20px; margin-bottom: 0;"></h3>
 </div>
 
-<div id="calendar" class="calendar"></div>
+<div class="calendar-container">
+    <div id="calendar" class="calendar"></div>
+</div>
 
-<!-- BOOKING -->
-<div id="bookingModal" class="modal"><div class="box">
-<input id="date" type="date">
-<input id="meeting" placeholder="หัวข้อ">
-<input id="detail" placeholder="รายละเอียด">
-<input id="userName" placeholder="ชื่อ">
-<input id="phone" placeholder="เบอร์">
-<button onclick="submitBooking()">บันทึก</button>
-<button onclick="closeModal('bookingModal')">ปิด</button>
-</div></div>
+<div id="bookingModal" class="modal">
+    <div class="modal-content">
+        <h3>📝 ข้อมูลการจอง</h3>
+        <input type="date" id="formDate">
+        <input type="text" id="formSubject" placeholder="หัวข้อการประชุม">
+        <input type="text" id="formDetail" placeholder="รายละเอียด">
+        <input type="text" id="formUser" placeholder="ชื่อผู้จอง">
+        <input type="text" id="formPhone" placeholder="เบอร์โทรศัพท์">
+        <button onclick="submitBooking()">ยืนยันการจอง</button>
+        <button class="btn-close" onclick="closeModal('bookingModal')">ยกเลิก</button>
+    </div>
+</div>
 
-<!-- ADMIN -->
-<div id="adminModal" class="modal"><div class="box">
-<div id="adminDetail"></div>
-<button onclick="updateStatus('approved')">Approve</button>
-<button onclick="updateStatus('rejected')">Reject</button>
-<button onclick="updateStatus('cancel')">Cancel</button>
-<button onclick="closeModal('adminModal')">ปิด</button>
-</div></div>
+<div id="adminModal" class="modal">
+    <div class="modal-content">
+        <h3>🛡️ จัดการการจอง</h3>
+        <div id="adminInfo" style="margin-bottom: 15px; line-height: 1.6;"></div>
+        <button class="btn-approve" onclick="updateStatus('approved')">อนุมัติ (Approve)</button>
+        <button class="btn-reject" onclick="updateStatus('rejected')">ปฏิเสธ (Reject)</button>
+        <button class="btn-close" onclick="closeModal('adminModal')">ปิด</button>
+    </div>
+</div>
 
 <script>
-const GAS_URL="https://script.google.com/macros/s/AKfycbx_Nop30QZjN6yMa8SzjhUrzMCaHD8qKqodsSumGlBv2dnEIWMsH8OYZZ-K9-k68GFh/exec";
-let data=[];
-let isLoading=false;
-let isAdmin=false;
-let currentID=null;
+    const API_URL = "YOUR_APPS_SCRIPT_URL"; // *** สำคัญ: นำ URL จากการ Deploy มาวางตรงนี้ ***
+    let bookings = [];
+    let isAdmin = false;
+    let selectedBookingId = null;
 
-// clock
-setInterval(()=>{
- document.getElementById('clock').innerText=new Date().toLocaleTimeString('th-TH',{timeZone:'Asia/Bangkok'});
-},1000);
+    // ระบบเวลา
+    setInterval(() => {
+        document.getElementById('clock').innerText = new Date().toLocaleTimeString('th-TH');
+    }, 1000);
 
-function setConn(s){
- const el=document.getElementById('conn');
- el.innerText=s?'Online':'Offline';
- el.style.background=s?'#22c55e':'#ef4444';
-}
+    // ดึงข้อมูล
+    async function fetchData() {
+        try {
+            const res = await fetch(API_URL);
+            bookings = await res.json();
+            renderCalendar();
+        } catch (e) { console.log("Offline or Error"); }
+    }
 
-function formatDate(d){
- return new Date(d).toISOString().split('T')[0];
-}
+    function renderCalendar() {
+        const cal = document.getElementById('calendar');
+        cal.innerHTML = '';
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth();
+        
+        document.getElementById('monthLabel').innerText = now.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' });
+        
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-async function fetchData(){
- if(isLoading) return;
- isLoading=true;
- try{
-  const res=await fetch(GAS_URL+'?t='+Date.now());
-  const json=await res.json();
-  data=json;
-  setConn(true);
-  renderCalendar();
- }catch(e){
-  setConn(false);
- }
- isLoading=false;
-}
+        for (let i = 1; i <= daysInMonth; i++) {
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+            const dayData = bookings.filter(b => b.Date.split('T')[0] === dateStr);
+            
+            // ตรวจสอบสถานะ
+            const hasApproved = dayData.some(d => d.Status === 'approved');
+            const hasPending = dayData.some(d => d.Status === 'pending');
 
-function renderCalendar(){
- const cal=document.getElementById('calendar');
- cal.innerHTML='';
- const now=new Date();
- document.getElementById('monthLabel').innerText=`เดือน ${now.toLocaleDateString('th-TH',{month:'long',year:'numeric'})}`;
- const days=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
+            let statusClass = 'status-free';
+            let statusText = 'ว่าง';
 
- for(let i=1;i<=days;i++){
-  const d=new Date(now.getFullYear(),now.getMonth(),i);
-  const ds=d.toISOString().split('T')[0];
-  const dayData=data.filter(x=>formatDate(x.Date)===ds);
+            if (hasApproved) { statusClass = 'status-busy'; statusText = 'จองแล้ว'; }
+            else if (hasPending) { statusClass = 'status-pending'; statusText = 'รออนุมัติ'; }
 
-  const approved=dayData.some(x=>x.Status?.toLowerCase()==='approved');
+            const card = document.createElement('div');
+            card.className = 'day-card';
+            card.innerHTML = `
+                <div class="day-num">${i}</div>
+                <div class="status-tag ${statusClass}">${statusText}</div>
+            `;
+            card.onclick = () => handleDayClick(dateStr, dayData);
+            cal.appendChild(card);
+        }
+    }
 
-  cal.innerHTML+=`<div class="day" onclick="openDay('${ds}')">
-  <div>${i}</div>
-  <div class="status ${approved?'partial':'available'}">${approved?'มีการจอง':'ว่าง'}</div>
-  </div>`;
- }
-}
+    function handleDayClick(date, dayData) {
+        if (!isAdmin) {
+            if (dayData.length > 0) {
+                alert(`วันที่ ${date}:\n${dayData.map(d => `- ${d.Subject} (${d.Status})`).join('\n')}`);
+            }
+        } else {
+            if (dayData.length > 0) {
+                const b = dayData[0]; // ตัวอย่างการเลือกคิวแรกมาจัดการ
+                selectedBookingId = b.ID;
+                document.getElementById('adminInfo').innerHTML = `
+                    <b>ผู้จอง:</b> ${b.User}<br>
+                    <b>เรื่อง:</b> ${b.Subject}<br>
+                    <b>เบอร์:</b> ${b.Phone}<br>
+                    <b>สถานะปัจจุบัน:</b> ${b.Status}
+                `;
+                document.getElementById('adminModal').style.display = 'flex';
+            }
+        }
+    }
 
-function openDay(date){
- if(!isAdmin) return;
- const d=data.find(x=>formatDate(x.Date)===date);
- if(!d) return;
- currentID=d.ID;
- document.getElementById('adminDetail').innerHTML=`${d.subject}<br>${d.user}`;
- document.getElementById('adminModal').style.display='flex';
-}
+    async function submitBooking() {
+        const data = {
+            action: 'create',
+            Date: document.getElementById('formDate').value,
+            subject: document.getElementById('formSubject').value,
+            detail: document.getElementById('formDetail').value,
+            user: document.getElementById('formUser').value,
+            phone: document.getElementById('formPhone').value
+        };
 
-function openBooking(){
- document.getElementById('bookingModal').style.display='flex';
-}
+        if (!data.Date || !data.user) return alert("กรุณากรอกวันที่และชื่อผู้จอง");
 
-async function submitBooking(){
- await fetch(GAS_URL,{method:'POST',body:JSON.stringify({
-  action:'create',
-  data:{
-   Date:new Date(document.getElementById('date').value).toLocaleDateString('en-GB'),
-   'Start Time':'08:00',
-   StopTime:'12:00',
-   subject:document.getElementById('meeting').value,
-   detail:document.getElementById('detail').value,
-   user:document.getElementById('userName').value,
-   phone:document.getElementById('phone').value
-  }
- })});
- closeModal('bookingModal');
- fetchData();
-}
+        await fetch(API_URL, { method: 'POST', body: JSON.stringify(data) });
+        alert("ส่งคำขอเรียบร้อย");
+        closeModal('bookingModal');
+        fetchData();
+    }
 
-function updateStatus(status){
- fetch(GAS_URL,{method:'POST',body:JSON.stringify({action:'update',data:{ID:currentID},status})});
- closeModal('adminModal');
- fetchData();
-}
+    async function updateStatus(status) {
+        await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: 'update', id: selectedBookingId, status: status })
+        });
+        closeModal('adminModal');
+        fetchData();
+    }
 
-function openLogin(){isAdmin=true;alert('Admin mode');}
-function closeModal(id){document.getElementById(id).style.display='none';}
+    function openBooking() { document.getElementById('bookingModal').style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function toggleAdmin() { 
+        isAdmin = !isAdmin; 
+        alert(isAdmin ? "โหมดผู้ดูแลระบบ: เปิด (คลิกที่วันที่จองเพื่อ Manage)" : "โหมดผู้ดูแลระบบ: ปิด"); 
+    }
 
-// init
-renderCalendar();
-fetchData();
-setInterval(fetchData,5000);
+    fetchData();
 </script>
 </body>
 </html>
