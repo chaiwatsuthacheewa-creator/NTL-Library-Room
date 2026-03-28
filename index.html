@@ -7,93 +7,149 @@
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #050b14;
-            --panel-bg: rgba(13, 22, 38, 0.7);
-            --neon-blue: #00f3ff;
-            --neon-green: #00ff66;
-            --neon-yellow: #ffcc00;
-            --neon-red: #ff003c;
-            --text-main: #e2e8f0;
+            /* ธีมสีเงิน (Metallic Silver) */
+            --silver-bg: #e0e5ec;
+            --silver-dark: #a3b1c6;
+            --silver-light: #ffffff;
+            
+            /* สีข้อความ */
+            --text-main: #2d3748;
+            --text-muted: #718096;
+            
+            /* สีสถานะใหม่ */
+            --color-free: #10b981;     /* เขียว: ว่าง */
+            --color-booked: #ef4444;   /* แดง: จองแล้ว */
+            --color-pending: #f59e0b;  /* เหลือง: รอตรวจสอบ */
         }
         
-        body { margin: 0; padding: 20px; font-family: 'Kanit', sans-serif; background: var(--bg-color); color: var(--text-main); background-image: radial-gradient(circle at 50% 0%, #112240 0%, transparent 70%); }
+        body { 
+            margin: 0; padding: 20px; 
+            font-family: 'Kanit', sans-serif; 
+            background: var(--silver-bg); 
+            color: var(--text-main); 
+        }
         
+        /* สไตล์ปุ่มและกล่องแบบโลหะนูน (Neumorphism) */
+        .metal-panel {
+            background: var(--silver-bg);
+            border-radius: 16px;
+            box-shadow: 9px 9px 16px rgba(163,177,198,0.6), 
+                       -9px -9px 16px rgba(255,255,255, 0.7);
+            padding: 20px;
+        }
+
         /* Header */
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background: var(--panel-bg); border: 1px solid rgba(0, 243, 255, 0.2); border-radius: 12px; box-shadow: 0 0 20px rgba(0, 243, 255, 0.1); backdrop-filter: blur(10px); margin-bottom: 20px; }
-        .title { margin: 0; font-size: 24px; color: var(--neon-blue); text-shadow: 0 0 10px rgba(0,243,255,0.5); font-weight: 600; letter-spacing: 1px; }
-        .subtitle { font-size: 13px; color: #8892b0; margin-top: 5px; }
+        .header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            margin-bottom: 25px; 
+        }
+        .title { 
+            margin: 0; font-size: 26px; font-weight: 600; 
+            color: #1a202c; letter-spacing: 0.5px;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+        }
+        .subtitle { font-size: 14px; color: var(--text-muted); margin-top: 5px; font-weight: 300; }
         
         /* Layout Grid */
-        .dashboard { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; align-items: start; }
+        .dashboard { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; align-items: start; }
         @media (max-width: 768px) { .dashboard { grid-template-columns: 1fr; } }
         
-        .panel { background: var(--panel-bg); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 20px; backdrop-filter: blur(10px); }
-        .panel-title { color: var(--neon-blue); font-size: 18px; margin-top: 0; border-bottom: 1px solid rgba(0,243,255,0.2); padding-bottom: 10px; margin-bottom: 15px; }
+        .panel-title { 
+            color: #1a202c; font-size: 20px; margin-top: 0; 
+            border-bottom: 2px solid var(--silver-dark); 
+            padding-bottom: 10px; margin-bottom: 15px; 
+        }
 
         /* Calendar */
         .calendar-header { display: flex; justify-content: space-between; margin-bottom: 15px; }
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
-        .day-header { text-align: center; color: #8892b0; font-size: 14px; margin-bottom: 5px; }
-        .day-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 10px; min-height: 80px; cursor: pointer; transition: all 0.3s; position: relative; display: flex; flex-direction: column; justify-content: space-between; }
-        .day-card:hover { border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(0,243,255,0.2); transform: translateY(-2px); }
-        .day-num { font-size: 18px; font-weight: 600; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; }
+        .day-header { text-align: center; color: var(--text-muted); font-size: 14px; font-weight: 600; margin-bottom: 5px; }
         
-        /* Status Indicators */
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
-        .status-text { font-size: 12px; text-align: right; }
+        .day-card { 
+            background: var(--silver-bg); 
+            border-radius: 12px; padding: 12px; min-height: 80px; 
+            cursor: pointer; transition: all 0.2s ease-in-out; 
+            display: flex; flex-direction: column; justify-content: space-between;
+            box-shadow: 5px 5px 10px rgba(163,177,198,0.4), 
+                       -5px -5px 10px rgba(255,255,255, 0.8);
+            border: 2px solid transparent;
+        }
+        .day-card:hover { transform: translateY(-3px); }
+        .day-card:active {
+            box-shadow: inset 5px 5px 10px rgba(163,177,198,0.4), 
+                        inset -5px -5px 10px rgba(255,255,255, 0.8);
+        }
+        .day-num { font-size: 18px; font-weight: 600; color: #4a5568; }
         
-        .state-empty { color: #5a6b8a; }
-        .state-pending { border-color: rgba(255,204,0,0.5); background: rgba(255,204,0,0.05); }
-        .state-pending .status-text { color: var(--neon-yellow); text-shadow: 0 0 5px var(--neon-yellow); }
-        .state-approved { border-color: rgba(0,255,102,0.5); background: rgba(0,255,102,0.05); }
-        .state-approved .status-text { color: var(--neon-green); text-shadow: 0 0 5px var(--neon-green); }
+        /* Status Colors */
+        .status-text { font-size: 13px; text-align: right; font-weight: 600; }
+        .state-empty { border-color: rgba(16, 185, 129, 0.3); } /* ขอบเขียวอ่อนๆ */
+        .state-pending { border-color: rgba(245, 158, 11, 0.4); } /* ขอบเหลือง */
+        .state-approved { border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.05); } /* ขอบแดงพร้อมพื้นหลังจางๆ */
 
         /* Details List */
-        .detail-item { background: rgba(0,0,0,0.3); border-left: 3px solid var(--neon-blue); padding: 12px; border-radius: 6px; margin-bottom: 10px; font-size: 14px; }
-        .detail-item.approved { border-color: var(--neon-green); }
-        .detail-item.pending { border-color: var(--neon-yellow); }
-        .empty-state { text-align: center; color: #5a6b8a; padding: 30px 0; font-style: italic; }
+        .detail-item { 
+            background: var(--silver-bg); padding: 15px; border-radius: 10px; margin-bottom: 12px; 
+            box-shadow: inset 4px 4px 8px rgba(163,177,198,0.3), 
+                        inset -4px -4px 8px rgba(255,255,255, 0.7);
+            border-left: 4px solid transparent;
+        }
+        .detail-item.approved { border-left-color: var(--color-booked); }
+        .detail-item.pending { border-left-color: var(--color-pending); }
+        .empty-state { text-align: center; color: var(--text-muted); padding: 30px 0; font-style: italic; }
 
-        /* Modal & Forms */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 100; }
-        .modal-content { background: #0d1626; padding: 25px; border-radius: 12px; width: 90%; max-width: 450px; border: 1px solid var(--neon-blue); box-shadow: 0 0 30px rgba(0,243,255,0.15); }
-        input, select { width: 100%; padding: 10px; margin: 8px 0 15px; border-radius: 6px; border: 1px solid #2a3b5c; background: #050b14; color: white; box-sizing: border-box; font-family: 'Kanit'; }
-        input:focus { outline: none; border-color: var(--neon-blue); box-shadow: 0 0 8px rgba(0,243,255,0.3); }
-        
-        .btn { padding: 10px 15px; border-radius: 6px; border: none; font-family: 'Kanit'; font-weight: 600; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px; font-size: 13px; }
-        .btn-primary { background: transparent; color: var(--neon-blue); border: 1px solid var(--neon-blue); }
-        .btn-primary:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 15px var(--neon-blue); }
-        .btn-approve { background: transparent; color: var(--neon-green); border: 1px solid var(--neon-green); width: 100%; margin-bottom: 10px;}
-        .btn-approve:hover { background: var(--neon-green); color: #000; box-shadow: 0 0 15px var(--neon-green); }
-        .btn-cancel { background: transparent; color: #8892b0; border: 1px solid #8892b0; }
-        .btn-cancel:hover { background: #8892b0; color: #000; }
+        /* Buttons & Inputs */
+        .btn { 
+            padding: 10px 18px; border-radius: 8px; border: none; font-family: 'Kanit'; 
+            font-weight: 600; cursor: pointer; transition: 0.2s; letter-spacing: 0.5px;
+            background: var(--silver-bg); color: var(--text-main);
+            box-shadow: 4px 4px 8px rgba(163,177,198,0.5), -4px -4px 8px rgba(255,255,255, 0.8);
+        }
+        .btn:hover { color: #000; }
+        .btn:active {
+            box-shadow: inset 3px 3px 6px rgba(163,177,198,0.5), 
+                        inset -3px -3px 6px rgba(255,255,255, 0.8);
+        }
+        .btn-primary { color: #2b6cb0; }
+        .btn-danger { color: var(--color-booked); }
+
+        /* Modal */
+        .modal { position: fixed; inset: 0; background: rgba(45, 55, 72, 0.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 100; }
+        .modal-content { background: var(--silver-bg); padding: 30px; border-radius: 20px; width: 90%; max-width: 450px; box-shadow: 15px 15px 30px rgba(0,0,0,0.2); }
+        input, select { 
+            width: 100%; padding: 12px; margin: 8px 0 15px; border-radius: 8px; 
+            border: none; background: var(--silver-bg); color: var(--text-main); font-family: 'Kanit';
+            box-shadow: inset 4px 4px 8px rgba(163,177,198,0.4), 
+                        inset -4px -4px 8px rgba(255,255,255, 0.8);
+        }
+        input:focus { outline: none; box-shadow: inset 4px 4px 8px rgba(163,177,198,0.6), inset -4px -4px 8px rgba(255,255,255, 1), 0 0 0 2px #cbd5e1; }
     </style>
 </head>
 <body>
 
-<div class="header">
+<div class="header metal-panel">
     <div>
-        <h1 class="title">SYS // NTL_LIBRARY_FL16</h1>
-        <div class="subtitle">TEAM: BSCS_GNR | CONTACT: 3262-3264 | STATUS: <span id="connStatus" style="color:var(--neon-green)">ONLINE</span></div>
+        <h1 class="title">⚙️ NTL LIBRARY FL.16</h1>
+        <div class="subtitle">BSCS_GNR | EXT: 3262-3264 | <span id="connStatus" style="color:var(--color-free); font-weight:600;">ONLINE</span></div>
     </div>
-    <div style="text-align: right; display: flex; gap: 10px; align-items: center;">
-        <div id="clock" style="font-size: 20px; color: var(--neon-blue); font-weight: 300; margin-right: 15px;">00:00</div>
+    <div style="display: flex; gap: 15px; align-items: center;">
+        <div id="clock" style="font-size: 22px; color: #4a5568; font-weight: 600; letter-spacing: 1px;">00:00</div>
         <button class="btn btn-primary" onclick="openBooking()">+ จองห้อง</button>
-        <button class="btn btn-primary" style="border-color: var(--neon-red); color: var(--neon-red);" onclick="toggleAdmin()">ADMIN</button>
+        <button class="btn btn-danger" onclick="toggleAdmin()">🛡️ ADMIN</button>
     </div>
 </div>
 
 <div class="dashboard">
-    <div class="panel">
+    <div class="metal-panel">
         <div class="calendar-header">
             <h2 class="panel-title" style="margin:0; border:none;" id="monthLabel">Loading...</h2>
         </div>
         <div class="calendar-grid" id="calendarGrid"></div>
     </div>
 
-    <div class="panel">
+    <div class="metal-panel">
         <h2 class="panel-title">รายละเอียดการใช้งาน</h2>
-        <div id="selectedDateLabel" style="color: #8892b0; margin-bottom: 15px; font-size: 14px;">คลิกที่วันที่ในปฏิทินเพื่อดูข้อมูล</div>
+        <div id="selectedDateLabel" style="color: var(--text-muted); margin-bottom: 15px; font-size: 14px;">คลิกที่วันที่ในปฏิทินเพื่อดูข้อมูล</div>
         <div id="detailsContainer">
             <div class="empty-state">กรุณาเลือกวันที่</div>
         </div>
@@ -102,31 +158,45 @@
 
 <div id="bookingModal" class="modal">
     <div class="modal-content">
-        <h3 style="color: var(--neon-blue); margin-top: 0;">DATA INPUT // จองห้องสมุด</h3>
-        <label>วันที่:</label>
+        <h3 style="color: #2d3748; margin-top: 0; border-bottom: 2px solid #cbd5e1; padding-bottom: 10px;">แบบฟอร์มจองห้อง</h3>
+        <label style="font-size: 14px; font-weight: 600; color: #4a5568;">วันที่:</label>
         <input type="date" id="formDate">
-        <div style="display: flex; gap: 10px;">
-            <div style="flex:1"><label>เริ่ม:</label><input type="time" id="startTime" value="09:00"></div>
-            <div style="flex:1"><label>ถึง:</label><input type="time" id="stopTime" value="10:00"></div>
-        </div>
-        <label>หัวข้อ:</label><input type="text" id="formSubject" placeholder="เช่น ประชุมสรุปโปรเจกต์">
-        <label>รายละเอียด:</label><input type="text" id="formDetail" placeholder="...">
-        <label>ผู้จอง:</label><input type="text" id="formUser" placeholder="ชื่อ-นามสกุล หรือ ทีม">
-        <label>เบอร์โทร:</label><input type="text" id="formPhone" placeholder="Ext. หรือ เบอร์มือถือ">
         
-        <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <div style="display: flex; gap: 15px;">
+            <div style="flex:1">
+                <label style="font-size: 14px; font-weight: 600; color: #4a5568;">เริ่ม:</label>
+                <input type="time" id="startTime" value="09:00">
+            </div>
+            <div style="flex:1">
+                <label style="font-size: 14px; font-weight: 600; color: #4a5568;">ถึง:</label>
+                <input type="time" id="stopTime" value="10:00">
+            </div>
+        </div>
+        
+        <label style="font-size: 14px; font-weight: 600; color: #4a5568;">หัวข้อ:</label>
+        <input type="text" id="formSubject" placeholder="เช่น ประชุมสรุปโปรเจกต์">
+        
+        <label style="font-size: 14px; font-weight: 600; color: #4a5568;">รายละเอียด:</label>
+        <input type="text" id="formDetail" placeholder="...">
+        
+        <label style="font-size: 14px; font-weight: 600; color: #4a5568;">ผู้จอง:</label>
+        <input type="text" id="formUser" placeholder="ชื่อ-นามสกุล หรือ ทีม">
+        
+        <label style="font-size: 14px; font-weight: 600; color: #4a5568;">เบอร์โทร:</label>
+        <input type="text" id="formPhone" placeholder="Ext. หรือ เบอร์มือถือ">
+        
+        <div style="display: flex; gap: 15px; margin-top: 15px;">
             <button class="btn btn-primary" style="flex: 2;" onclick="submitBooking()" id="submitBtn">ยืนยันการจอง</button>
-            <button class="btn btn-cancel" style="flex: 1;" onclick="closeModal('bookingModal')">ยกเลิก</button>
+            <button class="btn" style="flex: 1;" onclick="closeModal('bookingModal')">ยกเลิก</button>
         </div>
     </div>
 </div>
 
 <script>
-    const API_URL = "YOUR_APPS_SCRIPT_URL"; // *** ใส่ URL ตรงนี้ ***
+    const API_URL = "YOUR_APPS_SCRIPT_URL"; // *** ใส่ URL Google Apps Script ตรงนี้ ***
     let bookings = [];
     let isAdmin = false;
 
-    // นาฬิกา
     setInterval(() => {
         const now = new Date();
         document.getElementById('clock').innerText = now.toLocaleTimeString('th-TH', {hour: '2-digit', minute:'2-digit', second:'2-digit'});
@@ -134,56 +204,42 @@
 
     const dayNames = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
 
-    async function fetchData() {
-        try {
-            const res = await fetch(API_URL);
-            bookings = await res.json();
-            renderCalendar();
-            document.getElementById('connStatus').innerText = "SYNCED";
-            document.getElementById('connStatus').style.color = "var(--neon-green)";
-        } catch (e) { 
-            document.getElementById('connStatus').innerText = "OFFLINE";
-            document.getElementById('connStatus').style.color = "var(--neon-red)";
-        }
-    }
-
     function renderCalendar() {
         const cal = document.getElementById('calendarGrid');
-        cal.innerHTML = '';
+        cal.innerHTML = ''; 
         
-        // ใส่หัววัน
-        dayNames.forEach(d => {
-            cal.innerHTML += `<div class="day-header">${d}</div>`;
-        });
+        dayNames.forEach(d => { cal.innerHTML += `<div class="day-header">${d}</div>`; });
 
         const now = new Date();
         const year = now.getFullYear();
         const month = now.getMonth();
-        document.getElementById('monthLabel').innerText = now.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' }).toUpperCase();
         
-        // หาวันแรกของเดือนว่าตรงกับวันอะไร เพื่อเว้นช่องว่าง
+        document.getElementById('monthLabel').innerText = now.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' });
+        
         const firstDayIndex = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-        // เติมช่องว่างด้านหน้า
-        for(let i=0; i<firstDayIndex; i++) { cal.innerHTML += `<div></div>`; }
+        let blanks = '';
+        for(let i = 0; i < firstDayIndex; i++) { blanks += `<div></div>`; }
+        cal.innerHTML += blanks;
 
         for (let i = 1; i <= daysInMonth; i++) {
             const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
             const dayData = bookings.filter(b => b.Date && b.Date.split('T')[0] === dateStr);
             
-            let cardClass = 'day-card';
-            let statusHtml = '<div class="status-text state-empty">ว่าง</div>';
+            // เปลี่ยน Logic ตรงนี้ให้สีเขียวคือค่าเริ่มต้น (ว่าง) และแดงคือจองแล้ว
+            let cardClass = 'day-card state-empty';
+            let statusHtml = `<div class="status-text" style="color: var(--color-free);">🟢 ว่าง</div>`;
 
             const hasApproved = dayData.some(d => d.Status === 'approved');
             const hasPending = dayData.some(d => d.Status === 'pending');
 
             if (hasApproved) { 
-                cardClass += ' state-approved'; 
-                statusHtml = `<div class="status-text">🟢 อนุมัติแล้ว</div>`;
+                cardClass = 'day-card state-approved'; 
+                statusHtml = `<div class="status-text" style="color: var(--color-booked);">🔴 จองแล้ว</div>`;
             } else if (hasPending) { 
-                cardClass += ' state-pending'; 
-                statusHtml = `<div class="status-text">🟡 รอตรวจสอบ</div>`;
+                cardClass = 'day-card state-pending'; 
+                statusHtml = `<div class="status-text" style="color: var(--color-pending);">🟡 รอตรวจสอบ</div>`;
             }
 
             const card = document.createElement('div');
@@ -194,6 +250,24 @@
             `;
             card.onclick = () => showDetails(dateStr, dayData, i);
             cal.appendChild(card);
+        }
+    }
+
+    async function fetchData() {
+        try {
+            document.getElementById('connStatus').innerText = "SYNCING...";
+            document.getElementById('connStatus').style.color = "var(--color-pending)";
+            
+            const res = await fetch(API_URL);
+            bookings = await res.json();
+            
+            renderCalendar();
+            
+            document.getElementById('connStatus').innerText = "ONLINE";
+            document.getElementById('connStatus').style.color = "var(--color-free)";
+        } catch (e) { 
+            document.getElementById('connStatus').innerText = "OFFLINE";
+            document.getElementById('connStatus').style.color = "var(--color-booked)";
         }
     }
 
@@ -209,25 +283,25 @@
         container.innerHTML = '';
         dayData.sort((a,b) => a['Start Time'].localeCompare(b['Start Time'])).forEach(b => {
             const statusColor = b.Status === 'approved' ? 'approved' : 'pending';
-            const statusText = b.Status === 'approved' ? '🟢 อนุมัติแล้ว' : '🟡 รออนุมัติ';
+            const statusText = b.Status === 'approved' ? '<span style="color:var(--color-booked);">🔴 อนุมัติแล้ว</span>' : '<span style="color:var(--color-pending);">🟡 รออนุมัติ</span>';
             
             let adminBtns = '';
             if (isAdmin) {
                 adminBtns = `
-                <div style="margin-top: 10px; display:flex; gap:5px;">
-                    <button class="btn btn-approve" onclick="updateStatus('${b.ID}', 'approved')">APPROVE</button>
-                    <button class="btn btn-primary" style="border-color:var(--neon-red); color:var(--neon-red); width:100%" onclick="updateStatus('${b.ID}', 'rejected')">REJECT</button>
+                <div style="margin-top: 15px; display:flex; gap:10px;">
+                    <button class="btn" style="color:var(--color-booked); flex:1;" onclick="updateStatus('${b.ID}', 'approved')">APPROVE</button>
+                    <button class="btn" style="color:var(--text-muted); flex:1;" onclick="updateStatus('${b.ID}', 'rejected')">REJECT</button>
                 </div>`;
             }
 
             container.innerHTML += `
                 <div class="detail-item ${statusColor}">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                        <strong style="color:var(--neon-blue)">${b['Start Time']} - ${b.StopTime}</strong>
-                        <span style="font-size:12px;">${statusText}</span>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                        <strong style="color:#2b6cb0; font-size:16px;">${b['Start Time']} - ${b.StopTime}</strong>
+                        <span style="font-size:13px; font-weight:600;">${statusText}</span>
                     </div>
-                    <b>${b.Subject}</b><br>
-                    <span style="color:#8892b0; font-size:12px;">โดย: ${b.User} (โทร: ${b.Phone.replace(/'/g,'')})</span>
+                    <b style="color:#1a202c;">${b.Subject}</b><br>
+                    <span style="color:var(--text-muted); font-size:13px;">โดย: ${b.User} (โทร: ${b.Phone.replace(/'/g,'')})</span>
                     ${adminBtns}
                 </div>
             `;
@@ -249,29 +323,22 @@
 
         if (!data.Date || !data.subject || !data.user) return alert("โปรดกรอกข้อมูลสำคัญให้ครบถ้วน");
 
-        btn.innerText = "PROCESSING...";
+        btn.innerText = "กำลังบันทึก...";
         btn.disabled = true;
 
         try {
-            const res = await fetch(API_URL, { 
-                method: 'POST', 
-                body: JSON.stringify(data)
-            });
+            const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(data) });
             const result = await res.json();
             
             if (result.status === 'error') {
-                alert(result.msg); // แจ้งเตือนเวลาซ้ำ
+                alert(result.msg); 
             } else {
-                alert("ส่งคำขอสำเร็จ! ระบบกำลังรอการยืนยันจาก Admin");
+                alert("ส่งคำขอสำเร็จ! ระบบกำลังรอการยืนยัน");
                 closeModal('bookingModal');
-                fetchData();
+                fetchData(); 
             }
-        } catch (e) {
-            alert("Error: ขัดข้องในการส่งข้อมูล");
-        } finally {
-            btn.innerText = "ยืนยันการจอง";
-            btn.disabled = false;
-        }
+        } catch (e) { alert("Error: ขัดข้องในการส่งข้อมูล"); } 
+        finally { btn.innerText = "ยืนยันการจอง"; btn.disabled = false; }
     }
 
     async function updateStatus(id, status) {
@@ -287,10 +354,11 @@
     function toggleAdmin() { 
         isAdmin = !isAdmin; 
         alert(isAdmin ? "SYS: ADMIN MODE ONLINE\nสามารถกด Approve/Reject ได้ที่แผงรายละเอียดด้านขวา" : "SYS: ADMIN MODE OFFLINE"); 
-        document.getElementById('detailsContainer').innerHTML = `<div class="empty-state">รีเฟรชข้อมูล... กรุณาเลือกวันที่อีกครั้ง</div>`;
+        document.getElementById('detailsContainer').innerHTML = `<div class="empty-state">รีเฟรชโหมดแอดมิน... กรุณาเลือกวันที่อีกครั้ง</div>`;
     }
 
-    fetchData();
+    renderCalendar(); 
+    fetchData();      
 </script>
 </body>
 </html>
