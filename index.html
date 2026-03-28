@@ -47,7 +47,6 @@
         
         .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; }
         
-        /* สไตล์ปุ่มเปลี่ยนเดือน */
         .month-control { display: flex; align-items: center; gap: 15px; }
         .btn-icon-only { padding: 6px 12px; border-radius: 8px; font-size: 16px; font-weight: bold; }
 
@@ -70,15 +69,16 @@
         .day-card:hover { border-color: var(--primary); box-shadow: 0 5px 15px var(--primary-glow); }
         .day-card.is-today { background: rgba(56, 189, 248, 0.1); border: 1px solid var(--primary); box-shadow: inset 0 0 20px rgba(56, 189, 248, 0.2); }
         .day-card.is-today .day-num { color: var(--primary); text-shadow: 0 0 10px var(--primary-glow); }
-        .day-card.is-past { opacity: 0.5; cursor: not-allowed; } /* ทำให้วันในอดีตดูจางลงนิดหน่อย */
+        .day-card.is-past { opacity: 0.5; cursor: not-allowed; } 
         .day-num { font-size: 18px; font-weight: 600; color: #e2e8f0; }
         
         .slots-container { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
         .slot-badge { font-size: 13px; padding: 5px 8px; border-radius: 6px; text-align: left; font-weight: 600; letter-spacing: 0px; border-left: 4px solid transparent; transition: all 0.3s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
-        .slot-free { border-left-color: var(--color-free); color: rgba(255,255,255,0.6); background: linear-gradient(90deg, rgba(16, 185, 129, 0.2) 0%, transparent 60%); }
-        .slot-booked { border-left-color: var(--color-booked); color: #fff; background: linear-gradient(90deg, rgba(239, 68, 68, 0.5) 0%, transparent 80%); text-shadow: 0 0 4px rgba(0,0,0,0.8); }
-        .slot-pending { border-left-color: var(--color-pending); color: #fff; background: linear-gradient(90deg, rgba(245, 158, 11, 0.5) 0%, transparent 80%); text-shadow: 0 0 4px rgba(0,0,0,0.8); }
+        /* ปรับสีให้สว่างขึ้นในโหมด Desktop ด้วย */
+        .slot-free { border-left-color: var(--color-free); color: #6ee7b7; background: linear-gradient(90deg, rgba(16, 185, 129, 0.25) 0%, transparent 80%); }
+        .slot-booked { border-left-color: var(--color-booked); color: #fca5a5; background: linear-gradient(90deg, rgba(239, 68, 68, 0.5) 0%, transparent 80%); text-shadow: 0 0 4px rgba(0,0,0,0.8); }
+        .slot-pending { border-left-color: var(--color-pending); color: #fcd34d; background: linear-gradient(90deg, rgba(245, 158, 11, 0.5) 0%, transparent 80%); text-shadow: 0 0 4px rgba(0,0,0,0.8); }
 
         .chart-container { position: relative; height: 180px; width: 100%; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 20px; }
         .detail-item { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 12px; border-left: 4px solid var(--color-free); transition: 0.2s; word-wrap: break-word; }
@@ -137,7 +137,35 @@
             .day-num { font-size: 14px; text-align: center; }
             
             .slots-container { gap: 4px; margin-top: 5px; }
-            .slot-badge { font-size: 10px; padding: 4px 2px; text-align: center; border-left: none; border-bottom: 2px solid transparent; letter-spacing: -0.5px; }
+            
+            /* 💡 แก้ไขป้ายสถานะในมือถือ ให้สว่างและมีกรอบชัดเจนขึ้น */
+            .slot-badge { 
+                font-size: 11px; 
+                padding: 4px 2px; 
+                text-align: center; 
+                border-radius: 4px;
+                border-left: none; 
+                border: 1px solid transparent; /* ใช้กรอบรอบด้าน */
+                letter-spacing: 0px; 
+                background-image: none !important; /* ปิด Gradient ให้สีพื้นเต็ม */
+            }
+            
+            /* สีสันใหม่ในมือถือ สว่าง เด้ง ทะลุจอ */
+            .slot-free { 
+                background-color: rgba(16, 185, 129, 0.15) !important; 
+                border-color: rgba(16, 185, 129, 0.5) !important; 
+                color: #6ee7b7 !important; 
+            }
+            .slot-booked { 
+                background-color: rgba(239, 68, 68, 0.25) !important; 
+                border-color: rgba(239, 68, 68, 0.6) !important; 
+                color: #fca5a5 !important; 
+            }
+            .slot-pending { 
+                background-color: rgba(245, 158, 11, 0.25) !important; 
+                border-color: rgba(245, 158, 11, 0.6) !important; 
+                color: #fcd34d !important; 
+            }
             
             .btn-book-fab {
                 position: fixed; bottom: 20px; right: 20px; z-index: 900;
@@ -291,7 +319,7 @@
     let bookings = [];
     let isAdmin = false;
     let myChart = null;
-    let currentMonthOffset = 0; // 💡 ตัวแปรเก็บว่าอยู่เดือนปัจจุบัน (0) หรือเดือนหน้า (1)
+    let currentMonthOffset = 0; 
 
     const adminAccounts = { 'Ponk1': '9068', 'Addi2': '0396', 'Poppy3': '2161' };
 
@@ -337,13 +365,11 @@
         return { am, pm };
     }
 
-    // 💡 ฟังก์ชันจัดการการเลื่อนเดือน
     function changeMonth(offset) {
         currentMonthOffset += offset;
-        if (currentMonthOffset < 0) currentMonthOffset = 0; // ไม่ให้ย้อนอดีต
-        if (currentMonthOffset > 1) currentMonthOffset = 1; // ไม่ให้เกิน 1 เดือนล่วงหน้า
+        if (currentMonthOffset < 0) currentMonthOffset = 0; 
+        if (currentMonthOffset > 1) currentMonthOffset = 1; 
         
-        // เคลียร์กล่องรายละเอียดเมื่อเปลี่ยนเดือน
         document.getElementById('detailsContainer').innerHTML = `<div style="text-align:center; color:var(--text-muted); padding: 30px;">คลิกที่วันที่ในปฏิทินเพื่อดูข้อมูล</div>`;
         document.getElementById('selectedDateLabel').innerText = `รายละเอียดการจอง (เลือกวันที่)`;
         
@@ -363,13 +389,11 @@
         
         const todayStr = `${realNow.getFullYear()}-${String(realNow.getMonth()+1).padStart(2, '0')}-${String(realNow.getDate()).padStart(2, '0')}`;
         
-        // อัปเดตข้อความเดือนที่กำลังแสดง
         document.getElementById('monthLabel').innerHTML = `
             <svg viewBox="0 0 24 24" style="width:20px;fill:currentColor; margin-right:5px; vertical-align:text-bottom;"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg> 
             ${displayDate.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' })}
         `;
         
-        // จัดการซ่อน/โชว์ปุ่มเลื่อนเดือน
         document.getElementById('prevMonthBtn').style.display = currentMonthOffset > 0 ? 'inline-flex' : 'none';
         document.getElementById('nextMonthBtn').style.display = currentMonthOffset < 1 ? 'inline-flex' : 'none';
 
