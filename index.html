@@ -85,25 +85,12 @@
         .slots-container { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
         .slot-badge { 
             font-size: 13px; padding: 6px 10px; border-radius: 6px; text-align: left; 
-            font-weight: 600; letter-spacing: 0.5px;
-            border-left: 4px solid transparent; 
-            transition: all 0.3s;
+            font-weight: 600; letter-spacing: 0.5px; border-left: 4px solid transparent; transition: all 0.3s;
         }
         
-        .slot-free { 
-            border-left-color: var(--color-free); color: rgba(255,255,255,0.6); 
-            background: linear-gradient(90deg, rgba(16, 185, 129, 0.25) 0%, transparent 60%); 
-        }
-        .slot-booked { 
-            border-left-color: var(--color-booked); color: #fff; 
-            background: linear-gradient(90deg, rgba(239, 68, 68, 0.6) 0%, transparent 80%); 
-            text-shadow: 0 0 4px rgba(0,0,0,0.8); 
-        }
-        .slot-pending { 
-            border-left-color: var(--color-pending); color: #fff; 
-            background: linear-gradient(90deg, rgba(245, 158, 11, 0.6) 0%, transparent 80%); 
-            text-shadow: 0 0 4px rgba(0,0,0,0.8);
-        }
+        .slot-free { border-left-color: var(--color-free); color: rgba(255,255,255,0.6); background: linear-gradient(90deg, rgba(16, 185, 129, 0.25) 0%, transparent 60%); }
+        .slot-booked { border-left-color: var(--color-booked); color: #fff; background: linear-gradient(90deg, rgba(239, 68, 68, 0.6) 0%, transparent 80%); text-shadow: 0 0 4px rgba(0,0,0,0.8); }
+        .slot-pending { border-left-color: var(--color-pending); color: #fff; background: linear-gradient(90deg, rgba(245, 158, 11, 0.6) 0%, transparent 80%); text-shadow: 0 0 4px rgba(0,0,0,0.8); }
 
         .chart-container { position: relative; height: 200px; width: 100%; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 20px; }
 
@@ -140,7 +127,6 @@
         .modal-content { background: var(--bg-base); border: 1px solid var(--panel-border); padding: 30px; border-radius: 20px; width: 90%; max-width: 450px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); transform: translateY(20px); transition: 0.3s; }
         .modal.show .modal-content { transform: translateY(0); }
 
-        /* Toast Notification Styles */
         .toast-container { position: fixed; top: 25px; right: 25px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
         .toast {
             background: rgba(18, 26, 43, 0.9); backdrop-filter: blur(10px);
@@ -173,8 +159,8 @@
         <button class="btn btn-primary" onclick="openBooking()">
             <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7v-5z"/></svg> จองห้อง
         </button>
-        <button class="btn btn-outline" onclick="toggleAdmin()">
-            <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg> ADMIN
+        <button id="adminBtn" class="btn btn-outline" onclick="handleAdminClick()">
+            <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg> <span id="adminBtnText">ADMIN</span>
         </button>
     </div>
 </div>
@@ -182,27 +168,15 @@
 <div class="dashboard">
     <div class="glass-panel">
         <div class="calendar-nav">
-            <h2 class="section-title" id="monthLabel">
-                <svg viewBox="0 0 24 24" style="width:20px;fill:currentColor"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
-                LOADING...
-            </h2>
+            <h2 class="section-title" id="monthLabel">LOADING...</h2>
         </div>
         <div class="calendar-grid" id="calendarGrid"></div>
     </div>
 
     <div class="glass-panel">
-        <h2 class="section-title">
-            <svg viewBox="0 0 24 24" style="width:20px;fill:currentColor"><path d="M3 3v18h18v-2H5V3H3zm14 10.5l-3.5-3.5-4 4-3-3V14l3 3 4-4 3.5 3.5 2.5-2.5V11l-2.5 2.5z"/></svg>
-            USAGE TREND (MONTHLY)
-        </h2>
-        
-        <div class="chart-container">
-            <canvas id="trendChart"></canvas>
-        </div>
-
-        <div id="selectedDateLabel" style="color: var(--primary); margin-bottom: 15px; font-size: 14px; font-weight: 500;">
-            รายละเอียดการจอง (เลือกวันที่)
-        </div>
+        <h2 class="section-title">USAGE TREND (MONTHLY)</h2>
+        <div class="chart-container"><canvas id="trendChart"></canvas></div>
+        <div id="selectedDateLabel" style="color: var(--primary); margin-bottom: 15px; font-size: 14px; font-weight: 500;">รายละเอียดการจอง (เลือกวันที่)</div>
         <div id="detailsContainer" style="max-height: 350px; overflow-y: auto; padding-right: 5px;">
             <div style="text-align:center; color:var(--text-muted); padding: 20px;">คลิกที่วันที่ในปฏิทินเพื่อดูข้อมูล</div>
         </div>
@@ -211,33 +185,49 @@
 
 <div id="bookingModal" class="modal">
     <div class="modal-content">
-        <h3 style="color: #fff; margin-top: 0; display:flex; align-items:center; gap:8px;">
-            <svg viewBox="0 0 24 24" style="width:24px;fill:var(--primary)"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
-            แบบฟอร์มจองห้อง
-        </h3>
-        
-        <label>วันที่:</label>
-        <input type="date" id="formDate">
-        
+        <h3 style="color: #fff; margin-top: 0; display:flex; align-items:center; gap:8px;">แบบฟอร์มจองห้อง</h3>
+        <label>วันที่:</label><input type="date" id="formDate">
         <label>ช่วงเวลาที่ต้องการ:</label>
         <select id="timeSlot">
             <option value="morning">ช่วงเช้า (08.00 - 12.00 น.)</option>
             <option value="afternoon">ช่วงบ่าย (13.00 - 18.00 น.)</option>
             <option value="fullday">ทั้งวัน (08.00 - 18.00 น.)</option>
         </select>
-        
-        <label>หัวข้อการใช้งาน:</label>
-        <input type="text" id="formSubject" placeholder="เช่น ประชุมโปรเจกต์ AWS">
-        
-        <label>ผู้จอง / ทีม:</label>
-        <input type="text" id="formUser" placeholder="ชื่อ หรือ รหัสพนักงาน">
-        
-        <label>เบอร์โทรติดต่อ:</label>
-        <input type="text" id="formPhone" placeholder="เบอร์โทร หรือ Ext.">
-        
+        <label>หัวข้อการใช้งาน:</label><input type="text" id="formSubject" placeholder="เช่น ประชุมโปรเจกต์ AWS">
+        <label>ผู้จอง / ทีม:</label><input type="text" id="formUser" placeholder="ชื่อ หรือ รหัสพนักงาน">
+        <label>เบอร์โทรติดต่อ:</label><input type="text" id="formPhone" placeholder="เบอร์โทร หรือ Ext.">
         <div style="display: flex; gap: 12px; margin-top: 20px;">
             <button class="btn btn-primary" style="flex: 1;" onclick="submitBooking()" id="submitBtn">ยืนยันบันทึก</button>
             <button class="btn btn-outline" style="flex: 1;" onclick="closeModal('bookingModal')">ยกเลิก</button>
+        </div>
+    </div>
+</div>
+
+<div id="loginModal" class="modal">
+    <div class="modal-content" style="max-width: 350px;">
+        <h3 style="color: #fff; margin-top: 0; border-bottom: 1px solid var(--panel-border); padding-bottom:10px;">🔐 ADMIN LOGIN</h3>
+        <label>Username:</label>
+        <input type="text" id="loginUser" placeholder="admin1, admin2, admin3">
+        <label>Password:</label>
+        <input type="password" id="loginPass" placeholder="••••••••">
+        <div style="display: flex; gap: 12px; margin-top: 10px;">
+            <button class="btn btn-primary" style="flex: 1;" onclick="checkLogin()">เข้าสู่ระบบ</button>
+            <button class="btn btn-outline" style="flex: 1;" onclick="closeModal('loginModal')">ยกเลิก</button>
+        </div>
+    </div>
+</div>
+
+<div id="adminDashModal" class="modal">
+    <div class="modal-content" style="max-width: 600px; width: 95%;">
+        <h3 style="color: var(--primary); margin-top: 0; border-bottom: 1px solid var(--panel-border); padding-bottom:10px;">🛡️ ADMIN DASHBOARD</h3>
+        <div style="color: var(--text-muted); margin-bottom: 15px; font-size: 14px;">รายการจองที่รอการอนุมัติทั้งหมด (Pending)</div>
+        
+        <div id="pendingListContainer" style="max-height: 400px; overflow-y: auto; padding-right: 5px;">
+            </div>
+
+        <div style="display: flex; gap: 12px; margin-top: 20px; border-top: 1px solid var(--panel-border); padding-top:15px;">
+            <button class="btn btn-outline" style="color: var(--color-booked); border-color: var(--color-booked);" onclick="logoutAdmin()">ออกจากระบบ (Logout)</button>
+            <button class="btn btn-outline" style="flex: 1;" onclick="closeModal('adminDashModal')">ปิดหน้าต่าง</button>
         </div>
     </div>
 </div>
@@ -248,47 +238,48 @@
     let isAdmin = false;
     let myChart = null;
 
+    // ระบบบัญชี Admin
+    const adminAccounts = {
+        'admin1': '1111',
+        'admin2': '2222',
+        'admin3': '3333'
+    };
+
     setInterval(() => {
         document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB');
     }, 1000);
 
-    // สีประจำวัน
     const dayInfo = [
-        { name: 'อา', color: '#f87171' }, 
-        { name: 'จ', color: '#facc15' },  
-        { name: 'อ', color: '#f472b6' },  
-        { name: 'พ', color: '#34d399' },  
-        { name: 'พฤ', color: '#fb923c' }, 
-        { name: 'ศ', color: '#38bdf8' },  
-        { name: 'ส', color: '#c084fc' }   
+        { name: 'อา', color: '#f87171' }, { name: 'จ', color: '#facc15' }, { name: 'อ', color: '#f472b6' },  
+        { name: 'พ', color: '#34d399' }, { name: 'พฤ', color: '#fb923c' }, { name: 'ศ', color: '#38bdf8' }, { name: 'ส', color: '#c084fc' }   
     ];
     
-    // ระบบ Toast Notification 
     function showToast(msg, type = 'success') {
         const container = document.getElementById('toastContainer');
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
         
-        let icon = '';
-        if(type === 'success') icon = '<svg viewBox="0 0 24 24" style="fill:var(--color-free)"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>';
-        else if(type === 'error') icon = '<svg viewBox="0 0 24 24" style="fill:var(--color-booked)"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>';
-        else icon = '<svg viewBox="0 0 24 24" style="fill:var(--color-pending)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>';
+        let icon = type === 'success' 
+            ? '<svg viewBox="0 0 24 24" style="fill:var(--color-free)"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>'
+            : type === 'error' 
+            ? '<svg viewBox="0 0 24 24" style="fill:var(--color-booked)"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>'
+            : '<svg viewBox="0 0 24 24" style="fill:var(--color-pending)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>';
 
         toast.innerHTML = `${icon} <span>${msg}</span>`;
         container.appendChild(toast);
         
         setTimeout(() => toast.classList.add('show'), 10);
-        setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => toast.remove(), 400);
-        }, 3500);
+        setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 3500);
     }
 
+    // กรองพวกที่ถูก Cancel/Reject ออกจากการแสดงผลปฏิทิน
     function analyzeSlot(dayData) {
         let am = { status: 'free', class: 'slot-free' };
         let pm = { status: 'free', class: 'slot-free' };
 
         dayData.forEach(b => {
+            if (b.Status === 'rejected' || b.Status === 'cancelled') return;
+
             const startH = parseInt(b['Start Time'].split(':')[0]);
             const stopH = parseInt(b['StopTime'].split(':')[0]);
             const sClass = b.Status === 'approved' ? 'slot-booked' : 'slot-pending';
@@ -304,19 +295,14 @@
         const cal = document.getElementById('calendarGrid');
         cal.innerHTML = ''; 
         
-        dayInfo.forEach(d => { 
-            cal.innerHTML += `<div class="day-header" style="background: ${d.color}15; border: 1px solid ${d.color}40; color: ${d.color}; text-shadow: 0 0 8px ${d.color}80;">${d.name}</div>`; 
-        });
+        dayInfo.forEach(d => { cal.innerHTML += `<div class="day-header" style="background: ${d.color}15; border: 1px solid ${d.color}40; color: ${d.color}; text-shadow: 0 0 8px ${d.color}80;">${d.name}</div>`; });
 
         const now = new Date();
         const year = now.getFullYear();
         const month = now.getMonth();
         const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
         
-        document.getElementById('monthLabel').innerHTML = `
-            <svg viewBox="0 0 24 24" style="width:20px;fill:currentColor"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg> 
-            รอบเดือน ${now.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' })}
-        `;
+        document.getElementById('monthLabel').innerHTML = `รอบเดือน ${now.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' })}`;
         
         const firstDayIndex = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -327,10 +313,10 @@
 
         for (let i = 1; i <= daysInMonth; i++) {
             const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-            const dayData = bookings.filter(b => b.Date && b.Date.split('T')[0] === dateStr);
+            // ไม่นับรวมพวกถูก Cancel ในกราฟและการแสดงผลปฏิทิน
+            const dayData = bookings.filter(b => b.Date && b.Date.split('T')[0] === dateStr && b.Status !== 'rejected' && b.Status !== 'cancelled');
             
             chartData[i-1] = dayData.length;
-
             const slots = analyzeSlot(dayData);
             const isTodayClass = (dateStr === todayStr) ? 'is-today' : '';
 
@@ -343,7 +329,9 @@
                     <div class="slot-badge ${slots.pm.class}">บ่าย</div>
                 </div>
             `;
-            card.onclick = () => showDetails(dateStr, dayData, i);
+            // ดึงข้อมูลทั้งหมดรวมถึงที่ Cancel มาเผื่อให้ Admin ดูได้ในช่อง Detail
+            const rawDayData = bookings.filter(b => b.Date && b.Date.split('T')[0] === dateStr);
+            card.onclick = () => showDetails(dateStr, rawDayData, i);
             cal.appendChild(card);
         }
 
@@ -353,7 +341,6 @@
     function renderChart(dataArr, daysInMonth) {
         const ctx = document.getElementById('trendChart').getContext('2d');
         const labels = Array.from({length: daysInMonth}, (_, i) => i + 1);
-
         if (myChart) myChart.destroy();
 
         let gradient = ctx.createLinearGradient(0, 0, 0, 200);
@@ -361,30 +348,8 @@
         gradient.addColorStop(1, 'rgba(56, 189, 248, 0.0)');
 
         myChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'จำนวนการจอง',
-                    data: dataArr,
-                    borderColor: '#38bdf8',
-                    backgroundColor: gradient,
-                    borderWidth: 2,
-                    pointBackgroundColor: '#0a0f18',
-                    pointBorderColor: '#38bdf8',
-                    fill: true,
-                    tension: 0.4 
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
-                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', stepSize: 1 } }
-                }
-            }
+            type: 'line', data: { labels: labels, datasets: [{ label: 'จำนวนการจอง', data: dataArr, borderColor: '#38bdf8', backgroundColor: gradient, borderWidth: 2, pointBackgroundColor: '#0a0f18', fill: true, tension: 0.4 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(255,255,255,0.05)' } }, y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { stepSize: 1 } } } }
         });
     }
 
@@ -395,6 +360,12 @@
             const res = await fetch(API_URL);
             bookings = await res.json();
             renderCalendar();
+            
+            // ถ้ายืนยันหน้า Admin ค้างไว้ ให้โหลด List ใหม่ด้วย
+            if(isAdmin && document.getElementById('adminDashModal').classList.contains('show')) {
+                renderAdminDashboard();
+            }
+
             document.getElementById('connStatus').innerText = "ONLINE";
             document.getElementById('connStatus').style.color = "var(--color-free)";
         } catch (e) { 
@@ -403,31 +374,37 @@
         }
     }
 
-    function showDetails(dateStr, dayData, dayNum) {
+    function showDetails(dateStr, rawDayData, dayNum) {
         const container = document.getElementById('detailsContainer');
-        document.getElementById('selectedDateLabel').innerText = `ข้อมูลของวันที่: ${dayNum} ${document.getElementById('monthLabel').innerText.replace('รอบเดือน ', '')}`;
+        document.getElementById('selectedDateLabel').innerText = `ข้อมูลของวันที่: ${dayNum}`;
         
-        if (dayData.length === 0) {
+        // ซ่อน Cancel/Reject ให้ User ธรรมดา
+        const displayData = isAdmin ? rawDayData : rawDayData.filter(b => b.Status !== 'rejected' && b.Status !== 'cancelled');
+
+        if (displayData.length === 0) {
             container.innerHTML = `<div style="text-align:center; padding: 20px;"><div style="color:var(--text-muted); margin-bottom:15px;">ไม่มีการจองในวันนี้</div><button class="btn btn-primary" onclick="openBookingWithDate('${dateStr}')">จองเวลานี้</button></div>`;
             return;
         }
 
         container.innerHTML = '';
-        dayData.sort((a,b) => a['Start Time'].localeCompare(b['Start Time'])).forEach(b => {
-            const statusColor = b.Status === 'approved' ? 'booked' : 'pending';
-            const statusText = b.Status === 'approved' ? '<span style="color:var(--color-booked);">อนุมัติแล้ว</span>' : '<span style="color:var(--color-pending);">รอตรวจสอบ</span>';
+        displayData.sort((a,b) => a['Start Time'].localeCompare(b['Start Time'])).forEach(b => {
+            const statusColor = (b.Status === 'approved') ? 'booked' : (b.Status === 'pending' ? 'pending' : 'free');
+            const statusText = b.Status === 'approved' ? '<span style="color:var(--color-booked);">อนุมัติแล้ว</span>' 
+                             : b.Status === 'pending' ? '<span style="color:var(--color-pending);">รอตรวจสอบ</span>' 
+                             : `<span style="color:var(--text-muted); text-decoration: line-through;">ยกเลิกแล้ว</span>`;
             
             let adminBtns = '';
             if (isAdmin) {
                 adminBtns = `
                 <div style="margin-top: 12px; display:flex; gap:8px;">
-                    <button class="btn btn-outline" style="color:var(--color-free); border-color:var(--color-free); padding:5px 10px; font-size:12px;" onclick="updateStatus('${b.ID}', 'approved')">APPROVE</button>
-                    <button class="btn btn-outline" style="color:var(--color-booked); border-color:var(--color-booked); padding:5px 10px; font-size:12px;" onclick="updateStatus('${b.ID}', 'rejected')">REJECT</button>
+                    <button class="btn btn-outline" style="color:var(--color-free); border-color:var(--color-free); padding:5px 10px; font-size:12px;" onclick="updateStatus('${b.ID}', 'approved')">Approve</button>
+                    <button class="btn btn-outline" style="color:var(--color-pending); border-color:var(--color-pending); padding:5px 10px; font-size:12px;" onclick="updateStatus('${b.ID}', 'rejected')">Reject</button>
+                    <button class="btn btn-outline" style="color:var(--color-booked); border-color:var(--color-booked); padding:5px 10px; font-size:12px;" onclick="updateStatus('${b.ID}', 'cancelled')">Cancel</button>
                 </div>`;
             }
 
             container.innerHTML += `
-                <div class="detail-item ${statusColor}">
+                <div class="detail-item ${statusColor}" style="${(b.Status==='cancelled'||b.Status==='rejected')?'opacity:0.5':''}">
                     <div class="detail-meta">
                         <strong style="color:var(--primary); font-size:14px;">⏰ ${b['Start Time']} - ${b.StopTime}</strong>
                         <span>${statusText}</span>
@@ -443,70 +420,111 @@
     async function submitBooking() {
         const btn = document.getElementById('submitBtn');
         const slot = document.getElementById('timeSlot').value;
-        
         let st = "08:00", ed = "12:00";
         if (slot === 'afternoon') { st = "13:00"; ed = "18:00"; }
         else if (slot === 'fullday') { st = "08:00"; ed = "18:00"; }
 
-        const data = {
-            action: 'create',
-            Date: document.getElementById('formDate').value,
-            startTime: st,
-            stopTime: ed,
-            subject: document.getElementById('formSubject').value,
-            detail: "-",
-            user: document.getElementById('formUser').value,
-            phone: document.getElementById('formPhone').value
-        };
+        const data = { action: 'create', Date: document.getElementById('formDate').value, startTime: st, stopTime: ed, subject: document.getElementById('formSubject').value, detail: "-", user: document.getElementById('formUser').value, phone: document.getElementById('formPhone').value };
 
-        if (!data.Date || !data.subject || !data.user) {
-            showToast("โปรดกรอกข้อมูลสำคัญให้ครบถ้วน", "warning");
-            return;
-        }
-
-        btn.innerText = "กำลังบันทึก...";
-        btn.disabled = true;
+        if (!data.Date || !data.subject || !data.user) { showToast("โปรดกรอกข้อมูลสำคัญให้ครบถ้วน", "warning"); return; }
+        btn.innerText = "กำลังบันทึก..."; btn.disabled = true;
 
         try {
             const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(data) });
             const result = await res.json();
-            
-            if (result.status === 'error') { 
-                showToast(result.msg, "error"); 
-            } else {
-                showToast("บันทึกข้อมูลเสร็จแล้ว!", "success"); // <--- แจ้งเตือนความสำเร็จตรงนี้
-                closeModal('bookingModal');
-                fetchData(); 
-            }
-        } catch (e) { 
-            showToast("Error: ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้", "error"); 
-        } finally { 
-            btn.innerText = "ยืนยันบันทึก"; 
-            btn.disabled = false; 
+            if (result.status === 'error') { showToast(result.msg, "error"); } 
+            else { showToast("✅ บันทึกข้อมูลเสร็จแล้ว!", "success"); closeModal('bookingModal'); fetchData(); }
+        } catch (e) { showToast("Error: ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้", "error"); } 
+        finally { btn.innerText = "ยืนยันบันทึก"; btn.disabled = false; }
+    }
+
+    // --- ระบบ ADMIN ---
+    function handleAdminClick() {
+        if (isAdmin) {
+            renderAdminDashboard();
+            document.getElementById('adminDashModal').classList.add('show');
+        } else {
+            document.getElementById('loginUser').value = '';
+            document.getElementById('loginPass').value = '';
+            document.getElementById('loginModal').classList.add('show');
         }
     }
 
+    function checkLogin() {
+        const u = document.getElementById('loginUser').value;
+        const p = document.getElementById('loginPass').value;
+        
+        if (adminAccounts[u] && adminAccounts[u] === p) {
+            isAdmin = true;
+            showToast(`✅ ยินดีต้อนรับ แอดมิน ${u}`, 'success');
+            closeModal('loginModal');
+            document.getElementById('adminBtn').style.borderColor = "var(--primary)";
+            document.getElementById('adminBtn').style.color = "var(--primary)";
+            document.getElementById('adminBtnText').innerText = "DASHBOARD";
+            handleAdminClick(); // เปิดหน้า Dashboard ต่อเลย
+            renderCalendar();   // รีเฟรชปฏิทินให้ปุ่มโผล่
+        } else {
+            showToast('❌ Username หรือ Password ไม่ถูกต้อง', 'error');
+        }
+    }
+
+    function logoutAdmin() {
+        isAdmin = false;
+        showToast('ออกจากระบบแอดมินแล้ว', 'warning');
+        closeModal('adminDashModal');
+        document.getElementById('adminBtn').style.borderColor = "rgba(255,255,255,0.2)";
+        document.getElementById('adminBtn').style.color = "var(--text-main)";
+        document.getElementById('adminBtnText').innerText = "ADMIN";
+        renderCalendar();
+        document.getElementById('detailsContainer').innerHTML = `<div style="text-align:center; color:var(--text-muted); padding: 20px;">คลิกที่วันที่ในปฏิทินเพื่อดูข้อมูล</div>`;
+    }
+
+    function renderAdminDashboard() {
+        const container = document.getElementById('pendingListContainer');
+        const pending = bookings.filter(b => b.Status === 'pending');
+        
+        if (pending.length === 0) {
+            container.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:30px;">✅ ไม่มีรายการรออนุมัติ ในขณะนี้</div>';
+            return;
+        }
+
+        container.innerHTML = '';
+        pending.sort((a,b) => new Date(a.Date) - new Date(b.Date)).forEach(b => {
+            const dateFmt = b.Date ? b.Date.split('T')[0] : 'ไม่ระบุวันที่';
+            container.innerHTML += `
+                <div class="detail-item pending" style="margin-bottom: 15px;">
+                    <div class="detail-meta">
+                        <strong style="color:var(--primary); font-size:14px;">📅 ${dateFmt} | ⏰ ${b['Start Time']} - ${b.StopTime}</strong>
+                    </div>
+                    <div style="color:#fff; font-weight:500; margin-bottom:4px;">${b.Subject}</div>
+                    <div style="color:var(--text-muted); font-size:12px;">👤 ผู้จอง: ${b.User} | 📞 ${b.Phone.replace(/'/g,'')}</div>
+                    
+                    <div style="margin-top: 15px; display:flex; gap:10px;">
+                        <button class="btn btn-outline" style="flex:1; color:var(--color-free); border-color:var(--color-free); font-size:13px;" onclick="updateStatus('${b.ID}', 'approved')">Approve</button>
+                        <button class="btn btn-outline" style="flex:1; color:var(--color-pending); border-color:var(--color-pending); font-size:13px;" onclick="updateStatus('${b.ID}', 'rejected')">Reject</button>
+                        <button class="btn btn-outline" style="flex:1; color:var(--color-booked); border-color:var(--color-booked); font-size:13px;" onclick="updateStatus('${b.ID}', 'cancelled')">Cancel</button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
     async function updateStatus(id, status) {
-        if(!confirm(`SYSTEM CONFIRM: เปลี่ยนสถานะเป็น ${status.toUpperCase()}?`)) return;
+        let msg = status === 'approved' ? 'อนุมัติ' : status === 'rejected' ? 'ปฏิเสธ (Reject)' : 'ยกเลิก (Cancel)';
+        if(!confirm(`ยืนยันที่จะ ${msg} รายการนี้?`)) return;
+        
+        // แสดง Toast รอโหลด
+        showToast(`กำลัง ${msg}...`, "warning");
+        
         await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'update', id: id, status: status }) });
-        showToast("อัปเดตสถานะเรียบร้อย", "success");
-        fetchData();
-        document.getElementById('detailsContainer').innerHTML = `<div style="text-align:center; color:var(--text-muted); padding: 20px;">กำลังอัปเดตฐานข้อมูล...</div>`;
+        
+        showToast(`✅ ${msg} เรียบร้อยแล้ว`, "success");
+        fetchData(); // ดึงข้อมูลใหม่
     }
 
     function openBooking() { document.getElementById('bookingModal').classList.add('show'); }
     function openBookingWithDate(d) { document.getElementById('formDate').value = d; openBooking(); }
     function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-    
-    function toggleAdmin() { 
-        isAdmin = !isAdmin; 
-        if(isAdmin) {
-            showToast("ADMIN MODE: เปิดใช้งานแล้ว", "success");
-        } else {
-            showToast("ADMIN MODE: ปิดการใช้งาน", "warning");
-        }
-        document.getElementById('detailsContainer').innerHTML = `<div style="text-align:center; color:var(--text-muted); padding: 20px;">สิทธิ์เปลี่ยนแปลง... โปรดเลือกวันที่อีกครั้ง</div>`;
-    }
 
     renderCalendar(); 
     fetchData();      
