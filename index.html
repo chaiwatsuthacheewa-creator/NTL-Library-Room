@@ -59,7 +59,6 @@
         .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
         
-        /* แก้ไขกรอบหัววันให้ดูเป็นบล็อกสี */
         .day-header { 
             text-align: center; font-size: 14px; font-weight: 600; 
             padding: 8px 0; letter-spacing: 1px; border-radius: 8px;
@@ -83,29 +82,23 @@
         .day-card.is-today .day-num { color: var(--primary); text-shadow: 0 0 10px var(--primary-glow); }
         .day-num { font-size: 18px; font-weight: 600; color: #e2e8f0; }
         
-        /* Time Slots Indicator (เช้า/บ่าย) แบบ Gradient ครึ่งกรอบ */
         .slots-container { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
         .slot-badge { 
             font-size: 13px; padding: 6px 10px; border-radius: 6px; text-align: left; 
             font-weight: 600; letter-spacing: 0.5px;
-            border-left: 4px solid transparent; /* เส้นขอบหนาด้านซ้าย */
+            border-left: 4px solid transparent; 
             transition: all 0.3s;
         }
         
-        /* ว่าง (เขียว) */
         .slot-free { 
             border-left-color: var(--color-free); color: rgba(255,255,255,0.6); 
             background: linear-gradient(90deg, rgba(16, 185, 129, 0.25) 0%, transparent 60%); 
         }
-        
-        /* จองแล้ว (แดง) */
         .slot-booked { 
             border-left-color: var(--color-booked); color: #fff; 
             background: linear-gradient(90deg, rgba(239, 68, 68, 0.6) 0%, transparent 80%); 
-            text-shadow: 0 0 4px rgba(0,0,0,0.8); /* เพิ่มเงาดำให้ตัวหนังสืออ่านง่ายขึ้น */
+            text-shadow: 0 0 4px rgba(0,0,0,0.8); 
         }
-        
-        /* รอตรวจสอบ (เหลือง) */
         .slot-pending { 
             border-left-color: var(--color-pending); color: #fff; 
             background: linear-gradient(90deg, rgba(245, 158, 11, 0.6) 0%, transparent 80%); 
@@ -146,9 +139,26 @@
         .modal.show { display: flex; opacity: 1; }
         .modal-content { background: var(--bg-base); border: 1px solid var(--panel-border); padding: 30px; border-radius: 20px; width: 90%; max-width: 450px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); transform: translateY(20px); transition: 0.3s; }
         .modal.show .modal-content { transform: translateY(0); }
+
+        /* Toast Notification Styles */
+        .toast-container { position: fixed; top: 25px; right: 25px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast {
+            background: rgba(18, 26, 43, 0.9); backdrop-filter: blur(10px);
+            border-left: 4px solid var(--color-free);
+            padding: 15px 20px; border-radius: 8px; color: #fff;
+            display: flex; align-items: center; gap: 12px; font-weight: 500;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.error { border-left-color: var(--color-booked); }
+        .toast.warning { border-left-color: var(--color-pending); }
+        .toast svg { width: 20px; height: 20px; }
     </style>
 </head>
 <body>
+
+<div id="toastContainer" class="toast-container"></div>
 
 <div class="header glass-panel">
     <div class="title-box">
@@ -253,6 +263,27 @@
         { name: 'ส', color: '#c084fc' }   
     ];
     
+    // ระบบ Toast Notification 
+    function showToast(msg, type = 'success') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        let icon = '';
+        if(type === 'success') icon = '<svg viewBox="0 0 24 24" style="fill:var(--color-free)"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>';
+        else if(type === 'error') icon = '<svg viewBox="0 0 24 24" style="fill:var(--color-booked)"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>';
+        else icon = '<svg viewBox="0 0 24 24" style="fill:var(--color-pending)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>';
+
+        toast.innerHTML = `${icon} <span>${msg}</span>`;
+        container.appendChild(toast);
+        
+        setTimeout(() => toast.classList.add('show'), 10);
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 400);
+        }, 3500);
+    }
+
     function analyzeSlot(dayData) {
         let am = { status: 'free', class: 'slot-free' };
         let pm = { status: 'free', class: 'slot-free' };
@@ -273,7 +304,6 @@
         const cal = document.getElementById('calendarGrid');
         cal.innerHTML = ''; 
         
-        // เรนเดอร์หัววันเป็นกรอบสี
         dayInfo.forEach(d => { 
             cal.innerHTML += `<div class="day-header" style="background: ${d.color}15; border: 1px solid ${d.color}40; color: ${d.color}; text-shadow: 0 0 8px ${d.color}80;">${d.name}</div>`; 
         });
@@ -429,7 +459,10 @@
             phone: document.getElementById('formPhone').value
         };
 
-        if (!data.Date || !data.subject || !data.user) return alert("โปรดกรอกข้อมูลสำคัญให้ครบถ้วน");
+        if (!data.Date || !data.subject || !data.user) {
+            showToast("โปรดกรอกข้อมูลสำคัญให้ครบถ้วน", "warning");
+            return;
+        }
 
         btn.innerText = "กำลังบันทึก...";
         btn.disabled = true;
@@ -438,19 +471,25 @@
             const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(data) });
             const result = await res.json();
             
-            if (result.status === 'error') { alert(result.msg); } 
-            else {
-                alert("ส่งข้อมูลเข้าระบบเรียบร้อย!");
+            if (result.status === 'error') { 
+                showToast(result.msg, "error"); 
+            } else {
+                showToast("บันทึกข้อมูลเสร็จแล้ว!", "success"); // <--- แจ้งเตือนความสำเร็จตรงนี้
                 closeModal('bookingModal');
                 fetchData(); 
             }
-        } catch (e) { alert("Error: ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้"); } 
-        finally { btn.innerText = "ยืนยันบันทึก"; btn.disabled = false; }
+        } catch (e) { 
+            showToast("Error: ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้", "error"); 
+        } finally { 
+            btn.innerText = "ยืนยันบันทึก"; 
+            btn.disabled = false; 
+        }
     }
 
     async function updateStatus(id, status) {
         if(!confirm(`SYSTEM CONFIRM: เปลี่ยนสถานะเป็น ${status.toUpperCase()}?`)) return;
         await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'update', id: id, status: status }) });
+        showToast("อัปเดตสถานะเรียบร้อย", "success");
         fetchData();
         document.getElementById('detailsContainer').innerHTML = `<div style="text-align:center; color:var(--text-muted); padding: 20px;">กำลังอัปเดตฐานข้อมูล...</div>`;
     }
@@ -458,9 +497,14 @@
     function openBooking() { document.getElementById('bookingModal').classList.add('show'); }
     function openBookingWithDate(d) { document.getElementById('formDate').value = d; openBooking(); }
     function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+    
     function toggleAdmin() { 
         isAdmin = !isAdmin; 
-        alert(isAdmin ? "SYSTEM: ADMIN PRIVILEGES GRANTED" : "SYSTEM: ADMIN PRIVILEGES REVOKED"); 
+        if(isAdmin) {
+            showToast("ADMIN MODE: เปิดใช้งานแล้ว", "success");
+        } else {
+            showToast("ADMIN MODE: ปิดการใช้งาน", "warning");
+        }
         document.getElementById('detailsContainer').innerHTML = `<div style="text-align:center; color:var(--text-muted); padding: 20px;">สิทธิ์เปลี่ยนแปลง... โปรดเลือกวันที่อีกครั้ง</div>`;
     }
 
