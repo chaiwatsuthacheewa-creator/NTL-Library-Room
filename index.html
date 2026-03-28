@@ -37,23 +37,23 @@
         .title-box { display: flex; align-items: center; gap: 15px; }
         .sys-icon { width: 45px; height: 45px; fill: var(--primary); filter: drop-shadow(0 0 8px var(--primary-glow)); flex-shrink: 0; }
         .title { margin: 0; font-size: 28px; font-weight: 600; letter-spacing: 1px; color: #fff; line-height: 1.2; }
-        .subtitle { font-size: 14px; color: var(--text-muted); font-weight: 400; letter-spacing: 0.5px; margin-top: 2px;}
+        .subtitle { font-size: 14px; color: var(--text-muted); font-weight: 400; letter-spacing: 0.5px; margin-top: 4px;}
         
         .header-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
         #clock { font-size: 20px; color: var(--primary); font-weight: 300; margin-right: 15px; font-variant-numeric: tabular-nums; }
 
-        .dashboard { display: grid; grid-template-columns: 2fr 1.2fr; gap: 25px; align-items: start; padding-bottom: 80px; }
+        .dashboard { display: grid; grid-template-columns: 2fr 1.2fr; gap: 25px; align-items: start; padding-bottom: 40px; }
         .section-title { font-size: 16px; font-weight: 500; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; margin: 0; display: flex; align-items: center; gap: 8px; }
         
-        .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; }
+        .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 15px; }
         
         .month-control { display: flex; align-items: center; gap: 15px; }
-        .btn-icon-only { padding: 6px 12px; border-radius: 8px; font-size: 16px; font-weight: bold; }
+        .btn-icon-only { padding: 6px 14px; border-radius: 8px; font-size: 16px; font-weight: bold; }
 
         .status-legend {
             display: flex; gap: 15px; align-items: center; flex-wrap: wrap;
-            padding: 8px 15px; background: rgba(0,0,0,0.25); 
-            border: 1px solid rgba(255,255,255,0.05); border-radius: 10px;
+            padding: 10px 15px; background: rgba(0,0,0,0.25); 
+            border: 1px solid rgba(255,255,255,0.05); border-radius: 12px;
         }
         .legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-muted); font-weight: 400; }
         .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
@@ -63,7 +63,7 @@
 
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
         
-        .day-header { text-align: center; font-size: 14px; font-weight: 600; padding: 8px 0; letter-spacing: 1px; border-radius: 8px; margin-bottom: 5px; }
+        .day-header { text-align: center; font-size: 14px; font-weight: 600; padding: 10px 0; letter-spacing: 1px; border-radius: 8px; margin-bottom: 5px; }
         .day-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 10px; min-height: 110px; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
         .day-card:active { transform: scale(0.96); } 
         .day-card:hover { border-color: var(--primary); box-shadow: 0 5px 15px var(--primary-glow); }
@@ -73,12 +73,11 @@
         .day-num { font-size: 18px; font-weight: 600; color: #e2e8f0; }
         
         .slots-container { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
-        .slot-badge { font-size: 13px; padding: 5px 8px; border-radius: 6px; text-align: left; font-weight: 600; letter-spacing: 0px; border-left: 4px solid transparent; transition: all 0.3s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .slot-badge { font-size: 13px; padding: 6px 8px; border-radius: 6px; text-align: left; font-weight: 600; letter-spacing: 0px; border-left: 4px solid transparent; transition: all 0.3s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
-        /* ปรับสีให้สว่างขึ้นในโหมด Desktop ด้วย */
-        .slot-free { border-left-color: var(--color-free); color: #6ee7b7; background: linear-gradient(90deg, rgba(16, 185, 129, 0.25) 0%, transparent 80%); }
-        .slot-booked { border-left-color: var(--color-booked); color: #fca5a5; background: linear-gradient(90deg, rgba(239, 68, 68, 0.5) 0%, transparent 80%); text-shadow: 0 0 4px rgba(0,0,0,0.8); }
-        .slot-pending { border-left-color: var(--color-pending); color: #fcd34d; background: linear-gradient(90deg, rgba(245, 158, 11, 0.5) 0%, transparent 80%); text-shadow: 0 0 4px rgba(0,0,0,0.8); }
+        .slot-free { border-left-color: var(--color-free); color: rgba(255,255,255,0.6); background: linear-gradient(90deg, rgba(16, 185, 129, 0.2) 0%, transparent 60%); }
+        .slot-booked { border-left-color: var(--color-booked); color: #fff; background: linear-gradient(90deg, rgba(239, 68, 68, 0.5) 0%, transparent 80%); text-shadow: 0 0 4px rgba(0,0,0,0.8); }
+        .slot-pending { border-left-color: var(--color-pending); color: #fff; background: linear-gradient(90deg, rgba(245, 158, 11, 0.5) 0%, transparent 80%); text-shadow: 0 0 4px rgba(0,0,0,0.8); }
 
         .chart-container { position: relative; height: 180px; width: 100%; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 20px; }
         .detail-item { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 12px; border-left: 4px solid var(--color-free); transition: 0.2s; word-wrap: break-word; }
@@ -86,7 +85,7 @@
         .detail-item.pending { border-left-color: var(--color-pending); }
         .detail-meta { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; flex-wrap: wrap; gap: 5px; }
         
-        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border-radius: 10px; border: none; font-family: 'Kanit'; font-weight: 500; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); font-size: 14px; flex-shrink: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+        .btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border-radius: 10px; border: none; font-family: 'Kanit'; font-weight: 500; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); font-size: 14px; flex-shrink: 0; outline: none; -webkit-tap-highlight-color: transparent; }
         .btn:active { transform: scale(0.95); }
         .btn svg { width: 18px; height: 18px; fill: currentColor; flex-shrink: 0; }
         .btn-primary { background: var(--primary); color: #000; box-shadow: 0 0 15px rgba(56, 189, 248, 0.3); }
@@ -115,66 +114,79 @@
             .dashboard { grid-template-columns: 1fr; } 
         }
         
+        /* 📱 จัดรูปแบบมือถือใหม่ทั้งหมด (แก้ปุ่มซ้อน) */
         @media (max-width: 768px) {
-            body { padding: 10px 10px 90px 10px; }
-            .glass-panel { padding: 15px; border-radius: 12px; }
-            .header { flex-direction: column; align-items: stretch; gap: 10px; margin-bottom: 15px; }
-            .title-box { justify-content: flex-start; }
-            .header-actions { justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px; }
+            body { padding: 10px 10px 40px 10px; }
+            .glass-panel { padding: 15px; border-radius: 16px; }
             
-            #clock { display: none; }
+            .header { flex-direction: column; align-items: stretch; gap: 10px; margin-bottom: 15px; }
+            .title-box { justify-content: flex-start; margin-bottom: 5px; }
+            
+            #clock { display: none; } /* ซ่อนเวลาบนมือถือ */
             .title { font-size: 20px; }
             .subtitle { font-size: 12px; }
             .sys-icon { width: 35px; height: 35px; }
             
-            .calendar-nav { flex-direction: column; align-items: stretch; gap: 10px; margin-bottom: 15px; }
-            .month-control { justify-content: space-between; width: 100%; }
-            .status-legend { width: 100%; justify-content: space-between; padding: 10px; box-sizing: border-box; }
+            /* ✨ จัดระเบียบปุ่ม Header ใหม่ทั้งหมดให้อยู่ใน Grid/Flex ที่เป็นระเบียบ */
+            .header-actions { 
+                display: flex; 
+                flex-wrap: wrap; 
+                width: 100%; 
+                gap: 10px; 
+                padding-top: 15px; 
+                border-top: 1px solid rgba(255,255,255,0.08); 
+                justify-content: space-between;
+            }
+            .header-actions .btn {
+                flex: 1 1 45%; /* แบ่งครึ่งจอ */
+                max-width: 100%;
+                margin: 0;
+            }
+            /* ยกปุ่มจองห้องให้โดดเด่นและเต็มจอด้านบน */
+            .header-actions .btn-book {
+                flex: 1 1 100%; 
+                order: -1; /* สั่งให้อยู่บนสุดของกลุ่มปุ่มเสมอ */
+                padding: 15px;
+                font-size: 16px;
+                border-radius: 12px;
+            }
+            
+            /* ✨ จัดระเบียบส่วนเปลี่ยนเดือน */
+            .calendar-nav { flex-direction: column; align-items: stretch; gap: 12px; margin-bottom: 15px; }
+            .month-control { 
+                justify-content: space-between; 
+                width: 100%; 
+                background: rgba(0,0,0,0.2); 
+                padding: 5px; 
+                border-radius: 12px; 
+                border: 1px solid rgba(255,255,255,0.05);
+            }
+            .month-control .section-title { font-size: 15px; }
+            .btn-icon-only { background: rgba(255,255,255,0.05); border: none; }
+            
+            .status-legend { width: 100%; justify-content: space-between; padding: 12px; box-sizing: border-box; }
             .legend-item { font-size: 11px; }
 
-            .calendar-grid { gap: 5px; }
+            .calendar-grid { gap: 6px; }
             .day-card { padding: 6px; min-height: 85px; border-radius: 8px; border-width: 1px; }
             .day-num { font-size: 14px; text-align: center; }
             
             .slots-container { gap: 4px; margin-top: 5px; }
             
-            /* 💡 แก้ไขป้ายสถานะในมือถือ ให้สว่างและมีกรอบชัดเจนขึ้น */
+            /* ป้ายสถานะในมือถือ (สีชัด มีกรอบ) */
             .slot-badge { 
                 font-size: 11px; 
                 padding: 4px 2px; 
                 text-align: center; 
                 border-radius: 4px;
                 border-left: none; 
-                border: 1px solid transparent; /* ใช้กรอบรอบด้าน */
+                border: 1px solid transparent; 
                 letter-spacing: 0px; 
-                background-image: none !important; /* ปิด Gradient ให้สีพื้นเต็ม */
+                background-image: none !important; 
             }
-            
-            /* สีสันใหม่ในมือถือ สว่าง เด้ง ทะลุจอ */
-            .slot-free { 
-                background-color: rgba(16, 185, 129, 0.15) !important; 
-                border-color: rgba(16, 185, 129, 0.5) !important; 
-                color: #6ee7b7 !important; 
-            }
-            .slot-booked { 
-                background-color: rgba(239, 68, 68, 0.25) !important; 
-                border-color: rgba(239, 68, 68, 0.6) !important; 
-                color: #fca5a5 !important; 
-            }
-            .slot-pending { 
-                background-color: rgba(245, 158, 11, 0.25) !important; 
-                border-color: rgba(245, 158, 11, 0.6) !important; 
-                color: #fcd34d !important; 
-            }
-            
-            .btn-book-fab {
-                position: fixed; bottom: 20px; right: 20px; z-index: 900;
-                padding: 15px 25px; border-radius: 50px;
-                box-shadow: 0 10px 30px rgba(56, 189, 248, 0.6);
-                font-size: 16px; font-weight: 600;
-                display: flex; align-items: center; justify-content: center;
-            }
-            .btn-book-fab svg { width: 22px; height: 22px; }
+            .slot-free { background-color: rgba(16, 185, 129, 0.15) !important; border-color: rgba(16, 185, 129, 0.5) !important; color: #6ee7b7 !important; }
+            .slot-booked { background-color: rgba(239, 68, 68, 0.25) !important; border-color: rgba(239, 68, 68, 0.6) !important; color: #fca5a5 !important; }
+            .slot-pending { background-color: rgba(245, 158, 11, 0.25) !important; border-color: rgba(245, 158, 11, 0.6) !important; color: #fcd34d !important; }
             
             .modal { align-items: flex-end; padding: 0; }
             .modal-content {
@@ -206,15 +218,15 @@
     <div class="header-actions">
         <div id="clock">00:00:00</div>
         
-        <button id="homeBtn" class="btn btn-outline" onclick="goToMainMenu()" style="display: none; border-color: #10b981; color: #10b981; flex: 1; max-width: max-content;">
+        <button id="homeBtn" class="btn btn-outline" onclick="goToMainMenu()" style="display: none; border-color: #10b981; color: #10b981;">
             <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg> หน้าหลัก
         </button>
         
-        <button id="adminBtn" class="btn btn-outline" onclick="handleAdminClick()" style="flex: 1; max-width: max-content;">
+        <button id="adminBtn" class="btn btn-outline" onclick="handleAdminClick()">
             <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg> <span id="adminBtnText">ADMIN</span>
         </button>
         
-        <button class="btn btn-primary btn-book-fab" onclick="openBooking()">
+        <button class="btn btn-primary btn-book" onclick="openBooking()">
             <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7v-5z"/></svg> จองห้อง
         </button>
     </div>
@@ -224,7 +236,7 @@
     <div class="glass-panel">
         <div class="calendar-nav">
             <div class="month-control">
-                <button id="prevMonthBtn" class="btn btn-outline btn-icon-only" onclick="changeMonth(-1)" style="display: none;">&lt;</button>
+                <button id="prevMonthBtn" class="btn btn-outline btn-icon-only" onclick="changeMonth(-1)" style="display: none; visibility: hidden;">&lt;</button>
                 <h2 class="section-title" id="monthLabel" style="margin: 0; min-width: 150px; justify-content: center;">LOADING...</h2>
                 <button id="nextMonthBtn" class="btn btn-outline btn-icon-only" onclick="changeMonth(1)">&gt;</button>
             </div>
@@ -394,8 +406,23 @@
             ${displayDate.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' })}
         `;
         
-        document.getElementById('prevMonthBtn').style.display = currentMonthOffset > 0 ? 'inline-flex' : 'none';
-        document.getElementById('nextMonthBtn').style.display = currentMonthOffset < 1 ? 'inline-flex' : 'none';
+        // จัดการซ่อน/แสดงปุ่มเปลี่ยนเดือน แบบจองพื้นที่ไว้ไม่ให้เลื่อนไปมา
+        const prevBtn = document.getElementById('prevMonthBtn');
+        const nextBtn = document.getElementById('nextMonthBtn');
+        
+        if(currentMonthOffset > 0) {
+            prevBtn.style.display = 'inline-flex';
+            prevBtn.style.visibility = 'visible';
+        } else {
+            prevBtn.style.visibility = 'hidden'; // ซ่อนแต่ยังกินพื้นที่อยู่
+        }
+        
+        if(currentMonthOffset < 1) {
+            nextBtn.style.display = 'inline-flex';
+            nextBtn.style.visibility = 'visible';
+        } else {
+            nextBtn.style.visibility = 'hidden';
+        }
 
         const firstDayIndex = displayDate.getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -590,7 +617,7 @@
             
             const homeBtn = document.getElementById('homeBtn');
             if(homeBtn) {
-                homeBtn.style.display = "inline-flex";
+                homeBtn.style.display = "flex";
             }
             
             handleAdminClick();
