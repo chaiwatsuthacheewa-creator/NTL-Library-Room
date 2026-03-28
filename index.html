@@ -43,10 +43,14 @@
         #clock { font-size: 20px; color: var(--primary); font-weight: 300; margin-right: 15px; font-variant-numeric: tabular-nums; }
 
         .dashboard { display: grid; grid-template-columns: 2fr 1.2fr; gap: 25px; align-items: start; padding-bottom: 80px; }
-        .section-title { font-size: 16px; font-weight: 500; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; margin: 0 0 15px 0; display: flex; align-items: center; gap: 8px; }
+        .section-title { font-size: 16px; font-weight: 500; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; margin: 0; display: flex; align-items: center; gap: 8px; }
         
         .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; }
         
+        /* สไตล์ปุ่มเปลี่ยนเดือน */
+        .month-control { display: flex; align-items: center; gap: 15px; }
+        .btn-icon-only { padding: 6px 12px; border-radius: 8px; font-size: 16px; font-weight: bold; }
+
         .status-legend {
             display: flex; gap: 15px; align-items: center; flex-wrap: wrap;
             padding: 8px 15px; background: rgba(0,0,0,0.25); 
@@ -66,6 +70,7 @@
         .day-card:hover { border-color: var(--primary); box-shadow: 0 5px 15px var(--primary-glow); }
         .day-card.is-today { background: rgba(56, 189, 248, 0.1); border: 1px solid var(--primary); box-shadow: inset 0 0 20px rgba(56, 189, 248, 0.2); }
         .day-card.is-today .day-num { color: var(--primary); text-shadow: 0 0 10px var(--primary-glow); }
+        .day-card.is-past { opacity: 0.5; cursor: not-allowed; } /* ทำให้วันในอดีตดูจางลงนิดหน่อย */
         .day-num { font-size: 18px; font-weight: 600; color: #e2e8f0; }
         
         .slots-container { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
@@ -122,7 +127,8 @@
             .subtitle { font-size: 12px; }
             .sys-icon { width: 35px; height: 35px; }
             
-            .calendar-nav { flex-direction: column; align-items: flex-start; gap: 10px; margin-bottom: 15px; }
+            .calendar-nav { flex-direction: column; align-items: stretch; gap: 10px; margin-bottom: 15px; }
+            .month-control { justify-content: space-between; width: 100%; }
             .status-legend { width: 100%; justify-content: space-between; padding: 10px; box-sizing: border-box; }
             .legend-item { font-size: 11px; }
 
@@ -189,15 +195,19 @@
 <div class="dashboard">
     <div class="glass-panel">
         <div class="calendar-nav">
-            <h2 class="section-title" id="monthLabel" style="margin: 0;">LOADING...</h2>
+            <div class="month-control">
+                <button id="prevMonthBtn" class="btn btn-outline btn-icon-only" onclick="changeMonth(-1)" style="display: none;">&lt;</button>
+                <h2 class="section-title" id="monthLabel" style="margin: 0; min-width: 150px; justify-content: center;">LOADING...</h2>
+                <button id="nextMonthBtn" class="btn btn-outline btn-icon-only" onclick="changeMonth(1)">&gt;</button>
+            </div>
             
             <div class="status-legend">
                 <div class="legend-item"><span class="legend-dot dot-free"></span> ว่าง (Available)</div>
                 <div class="legend-item"><span class="legend-dot dot-pending"></span> รอตรวจสอบ (Pending)</div>
                 <div class="legend-item"><span class="legend-dot dot-booked"></span> จองแล้ว (Booked)</div>
             </div>
-            
         </div>
+        
         <div class="calendar-grid" id="calendarGrid"></div>
     </div>
 
@@ -281,6 +291,7 @@
     let bookings = [];
     let isAdmin = false;
     let myChart = null;
+    let currentMonthOffset = 0; // 💡 ตัวแปรเก็บว่าอยู่เดือนปัจจุบัน (0) หรือเดือนหน้า (1)
 
     const adminAccounts = { 'admin1': '1111', 'admin2': '2222', 'admin3': '3333' };
 
@@ -299,11 +310,7 @@
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
         
-        let icon = type === 'success' 
-            ? '<svg viewBox="0 0 24 24" style="fill:var(--color-free)"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>'
-            : type === 'error' 
-            ? '<svg viewBox="0 0 24 24" style="fill:var(--color-booked)"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>'
-            : '<svg viewBox="0 0 24 24" style="fill:var(--color-pending)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>';
+        let icon = type === 'success' ? '<svg viewBox="0 0 24 24" style="fill:var(--color-free)"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>' : type === 'error' ? '<svg viewBox="0 0 24 24" style="fill:var(--color-booked)"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>' : '<svg viewBox="0 0 24 24" style="fill:var(--color-pending)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>';
 
         toast.innerHTML = `${icon} <span>${msg}</span>`;
         container.appendChild(toast);
@@ -330,23 +337,43 @@
         return { am, pm };
     }
 
+    // 💡 ฟังก์ชันจัดการการเลื่อนเดือน
+    function changeMonth(offset) {
+        currentMonthOffset += offset;
+        if (currentMonthOffset < 0) currentMonthOffset = 0; // ไม่ให้ย้อนอดีต
+        if (currentMonthOffset > 1) currentMonthOffset = 1; // ไม่ให้เกิน 1 เดือนล่วงหน้า
+        
+        // เคลียร์กล่องรายละเอียดเมื่อเปลี่ยนเดือน
+        document.getElementById('detailsContainer').innerHTML = `<div style="text-align:center; color:var(--text-muted); padding: 30px;">คลิกที่วันที่ในปฏิทินเพื่อดูข้อมูล</div>`;
+        document.getElementById('selectedDateLabel').innerText = `รายละเอียดการจอง (เลือกวันที่)`;
+        
+        renderCalendar();
+    }
+
     function renderCalendar() {
         const cal = document.getElementById('calendarGrid');
         cal.innerHTML = ''; 
         
         dayInfo.forEach(d => { cal.innerHTML += `<div class="day-header" style="background: ${d.color}15; border: 1px solid ${d.color}40; color: ${d.color}; text-shadow: 0 0 8px ${d.color}80;">${d.name}</div>`; });
 
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = now.getMonth();
-        const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        const realNow = new Date();
+        const displayDate = new Date(realNow.getFullYear(), realNow.getMonth() + currentMonthOffset, 1);
+        const year = displayDate.getFullYear();
+        const month = displayDate.getMonth();
         
+        const todayStr = `${realNow.getFullYear()}-${String(realNow.getMonth()+1).padStart(2, '0')}-${String(realNow.getDate()).padStart(2, '0')}`;
+        
+        // อัปเดตข้อความเดือนที่กำลังแสดง
         document.getElementById('monthLabel').innerHTML = `
             <svg viewBox="0 0 24 24" style="width:20px;fill:currentColor; margin-right:5px; vertical-align:text-bottom;"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg> 
-            รอบเดือน ${now.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' })}
+            ${displayDate.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' })}
         `;
         
-        const firstDayIndex = new Date(year, month, 1).getDay();
+        // จัดการซ่อน/โชว์ปุ่มเลื่อนเดือน
+        document.getElementById('prevMonthBtn').style.display = currentMonthOffset > 0 ? 'inline-flex' : 'none';
+        document.getElementById('nextMonthBtn').style.display = currentMonthOffset < 1 ? 'inline-flex' : 'none';
+
+        const firstDayIndex = displayDate.getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
 
         for(let i = 0; i < firstDayIndex; i++) { cal.innerHTML += `<div></div>`; }
@@ -375,10 +402,10 @@
             cal.appendChild(card);
         }
 
-        renderChart(chartData, daysInMonth);
+        renderChart(chartData, daysInMonth, displayDate);
     }
 
-    function renderChart(dataArr, daysInMonth) {
+    function renderChart(dataArr, daysInMonth, displayDate) {
         const ctx = document.getElementById('trendChart').getContext('2d');
         const labels = Array.from({length: daysInMonth}, (_, i) => i + 1);
         if (myChart) myChart.destroy();
@@ -387,8 +414,10 @@
         gradient.addColorStop(0, 'rgba(56, 189, 248, 0.5)');
         gradient.addColorStop(1, 'rgba(56, 189, 248, 0.0)');
 
+        const monthName = displayDate.toLocaleDateString('th-TH', { month: 'short' });
+
         myChart = new Chart(ctx, {
-            type: 'line', data: { labels: labels, datasets: [{ label: 'จำนวนการจอง', data: dataArr, borderColor: '#38bdf8', backgroundColor: gradient, borderWidth: 2, pointBackgroundColor: '#0a0f18', fill: true, tension: 0.4 }] },
+            type: 'line', data: { labels: labels, datasets: [{ label: `การจองเดือน ${monthName}`, data: dataArr, borderColor: '#38bdf8', backgroundColor: gradient, borderWidth: 2, pointBackgroundColor: '#0a0f18', fill: true, tension: 0.4 }] },
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(255,255,255,0.05)' } }, y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { stepSize: 1 } } } }
         });
     }
@@ -535,7 +564,6 @@
             document.getElementById('adminBtn').style.color = "var(--primary)";
             document.getElementById('adminBtnText').innerText = "DASHBOARD";
             
-            // 💡 โชว์ปุ่ม "หน้าหลัก" เมื่อแอดมินล็อกอินสำเร็จ
             const homeBtn = document.getElementById('homeBtn');
             if(homeBtn) {
                 homeBtn.style.display = "inline-flex";
@@ -556,7 +584,6 @@
         document.getElementById('adminBtn').style.color = "var(--text-main)";
         document.getElementById('adminBtnText').innerText = "ADMIN";
         
-        // 💡 ซ่อนปุ่ม "หน้าหลัก" เมื่อแอดมินล็อกเอาต์
         const homeBtn = document.getElementById('homeBtn');
         if(homeBtn) {
             homeBtn.style.display = "none";
