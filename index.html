@@ -47,8 +47,27 @@
         
         .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 15px; }
         
-        .month-control { display: flex; align-items: center; gap: 15px; }
+        .month-control { display: flex; align-items: center; gap: 10px; }
         .btn-icon-only { padding: 6px 14px; border-radius: 8px; font-size: 16px; font-weight: bold; }
+
+        /* ✨ สไตล์สำหรับ Dropdown เลือกเดือน */
+        .month-dropdown {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--primary);
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-family: 'Kanit', sans-serif;
+            cursor: pointer;
+            outline: none;
+            text-align: center;
+            min-width: 160px;
+            transition: 0.3s;
+        }
+        .month-dropdown:hover, .month-dropdown:focus { border-color: var(--primary); background: rgba(0,0,0,0.6); box-shadow: 0 0 10px rgba(56, 189, 248, 0.2); }
+        .month-dropdown option { background: var(--bg-base); color: #fff; font-size: 15px; }
 
         .status-legend {
             display: flex; gap: 15px; align-items: center; flex-wrap: wrap;
@@ -64,22 +83,29 @@
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
         
         .day-header { text-align: center; font-size: 14px; font-weight: 600; padding: 10px 0; letter-spacing: 1px; border-radius: 8px; margin-bottom: 5px; }
-        .day-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 10px; min-height: 110px; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
+        .day-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 10px; min-height: 110px; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; justify-content: flex-start; position: relative; overflow: hidden; }
         .day-card:active { transform: scale(0.96); } 
         .day-card:hover { border-color: var(--primary); box-shadow: 0 5px 15px var(--primary-glow); }
         .day-card.is-today { background: rgba(56, 189, 248, 0.1); border: 1px solid var(--primary); box-shadow: inset 0 0 20px rgba(56, 189, 248, 0.2); }
         .day-card.is-today .day-num { color: var(--primary); text-shadow: 0 0 10px var(--primary-glow); }
-        .day-card.is-past { opacity: 0.5; cursor: not-allowed; } 
-        .day-num { font-size: 18px; font-weight: 600; color: #e2e8f0; }
         
-        .slots-container { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+        .day-disabled { background: rgba(255,255,255,0.01); border-color: rgba(255,255,255,0.02); opacity: 0.7; cursor: not-allowed; justify-content: center; align-items: center; }
+        .day-disabled:hover { border-color: rgba(255,255,255,0.02); box-shadow: none; transform: none; }
+        .day-disabled:active { transform: none; }
+        .holiday-text { font-size: 11px; color: #fca5a5; text-align: center; line-height: 1.2; font-weight: 500; margin-top: 5px; background: rgba(239, 68, 68, 0.15); padding: 4px; border-radius: 4px; width: 100%; box-sizing: border-box;}
+        .weekend-text { font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 5px; }
+        
+        .day-num { font-size: 18px; font-weight: 600; color: #e2e8f0; width: 100%; }
+        .day-disabled .day-num { text-align: center; }
+        
+        .slots-container { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; width: 100%; }
         .slot-badge { font-size: 13px; padding: 6px 8px; border-radius: 6px; text-align: left; font-weight: 600; letter-spacing: 0px; border-left: 4px solid transparent; transition: all 0.3s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
         .slot-free { border-left-color: var(--color-free); color: rgba(255,255,255,0.6); background: linear-gradient(90deg, rgba(16, 185, 129, 0.2) 0%, transparent 60%); }
         .slot-booked { border-left-color: var(--color-booked); color: #fff; background: linear-gradient(90deg, rgba(239, 68, 68, 0.5) 0%, transparent 80%); text-shadow: 0 0 4px rgba(0,0,0,0.8); }
         .slot-pending { border-left-color: var(--color-pending); color: #fff; background: linear-gradient(90deg, rgba(245, 158, 11, 0.5) 0%, transparent 80%); text-shadow: 0 0 4px rgba(0,0,0,0.8); }
 
-        .chart-container { position: relative; height: 180px; width: 100%; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 20px; }
+        .chart-container { position: relative; height: 220px; width: 100%; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 20px; }
         .detail-item { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 12px; border-left: 4px solid var(--color-free); transition: 0.2s; word-wrap: break-word; }
         .detail-item.booked { border-left-color: var(--color-booked); }
         .detail-item.pending { border-left-color: var(--color-pending); }
@@ -114,7 +140,6 @@
             .dashboard { grid-template-columns: 1fr; } 
         }
         
-        /* 📱 จัดรูปแบบมือถือใหม่ทั้งหมด (แก้ปุ่มซ้อน) */
         @media (max-width: 768px) {
             body { padding: 10px 10px 40px 10px; }
             .glass-panel { padding: 15px; border-radius: 16px; }
@@ -122,46 +147,21 @@
             .header { flex-direction: column; align-items: stretch; gap: 10px; margin-bottom: 15px; }
             .title-box { justify-content: flex-start; margin-bottom: 5px; }
             
-            #clock { display: none; } /* ซ่อนเวลาบนมือถือ */
+            #clock { display: none; }
             .title { font-size: 20px; }
             .subtitle { font-size: 12px; }
             .sys-icon { width: 35px; height: 35px; }
             
-            /* ✨ จัดระเบียบปุ่ม Header ใหม่ทั้งหมดให้อยู่ใน Grid/Flex ที่เป็นระเบียบ */
-            .header-actions { 
-                display: flex; 
-                flex-wrap: wrap; 
-                width: 100%; 
-                gap: 10px; 
-                padding-top: 15px; 
-                border-top: 1px solid rgba(255,255,255,0.08); 
-                justify-content: space-between;
-            }
-            .header-actions .btn {
-                flex: 1 1 45%; /* แบ่งครึ่งจอ */
-                max-width: 100%;
-                margin: 0;
-            }
-            /* ยกปุ่มจองห้องให้โดดเด่นและเต็มจอด้านบน */
-            .header-actions .btn-book {
-                flex: 1 1 100%; 
-                order: -1; /* สั่งให้อยู่บนสุดของกลุ่มปุ่มเสมอ */
-                padding: 15px;
-                font-size: 16px;
-                border-radius: 12px;
-            }
+            .header-actions { display: flex; flex-wrap: wrap; width: 100%; gap: 10px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.08); justify-content: space-between; }
+            .header-actions .btn { flex: 1 1 45%; max-width: 100%; margin: 0; }
+            .header-actions .btn-book { flex: 1 1 100%; order: -1; padding: 15px; font-size: 16px; border-radius: 12px; }
             
-            /* ✨ จัดระเบียบส่วนเปลี่ยนเดือน */
             .calendar-nav { flex-direction: column; align-items: stretch; gap: 12px; margin-bottom: 15px; }
-            .month-control { 
-                justify-content: space-between; 
-                width: 100%; 
-                background: rgba(0,0,0,0.2); 
-                padding: 5px; 
-                border-radius: 12px; 
-                border: 1px solid rgba(255,255,255,0.05);
-            }
-            .month-control .section-title { font-size: 15px; }
+            .month-control { justify-content: space-between; width: 100%; background: rgba(0,0,0,0.2); padding: 5px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
+            
+            /* Responsive Dropdown */
+            .month-dropdown { flex: 1; margin: 0 10px; font-size: 15px; min-width: unset; }
+            
             .btn-icon-only { background: rgba(255,255,255,0.05); border: none; }
             
             .status-legend { width: 100%; justify-content: space-between; padding: 12px; box-sizing: border-box; }
@@ -169,31 +169,17 @@
 
             .calendar-grid { gap: 6px; }
             .day-card { padding: 6px; min-height: 85px; border-radius: 8px; border-width: 1px; }
-            .day-num { font-size: 14px; text-align: center; }
+            .day-num { font-size: 14px; text-align: center; margin-bottom: 4px; }
             
-            .slots-container { gap: 4px; margin-top: 5px; }
+            .slots-container { gap: 5px; margin-top: auto; }
             
-            /* ป้ายสถานะในมือถือ (สีชัด มีกรอบ) */
-            .slot-badge { 
-                font-size: 11px; 
-                padding: 4px 2px; 
-                text-align: center; 
-                border-radius: 4px;
-                border-left: none; 
-                border: 1px solid transparent; 
-                letter-spacing: 0px; 
-                background-image: none !important; 
-            }
-            .slot-free { background-color: rgba(16, 185, 129, 0.15) !important; border-color: rgba(16, 185, 129, 0.5) !important; color: #6ee7b7 !important; }
-            .slot-booked { background-color: rgba(239, 68, 68, 0.25) !important; border-color: rgba(239, 68, 68, 0.6) !important; color: #fca5a5 !important; }
-            .slot-pending { background-color: rgba(245, 158, 11, 0.25) !important; border-color: rgba(245, 158, 11, 0.6) !important; color: #fcd34d !important; }
+            .slot-badge { font-size: 11px; font-weight: 600; padding: 4px 2px; text-align: center; border-radius: 5px; border-left: none; border: 1px solid transparent; letter-spacing: 0.5px; background-image: none !important; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+            .slot-free { background-color: rgba(16, 185, 129, 0.25) !important; border-color: rgba(16, 185, 129, 0.8) !important; color: #a7f3d0 !important; text-shadow: 0 0 6px rgba(16, 185, 129, 0.8); }
+            .slot-booked { background-color: rgba(239, 68, 68, 0.3) !important; border-color: rgba(239, 68, 68, 0.8) !important; color: #fecaca !important; text-shadow: 0 0 6px rgba(239, 68, 68, 0.8); }
+            .slot-pending { background-color: rgba(245, 158, 11, 0.3) !important; border-color: rgba(245, 158, 11, 0.8) !important; color: #fde68a !important; text-shadow: 0 0 6px rgba(245, 158, 11, 0.8); }
             
             .modal { align-items: flex-end; padding: 0; }
-            .modal-content {
-                border-radius: 24px 24px 0 0; width: 100%; max-width: 100%; margin: 0;
-                transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-                padding: 25px 20px 40px 20px; border-bottom: none;
-            }
+            .modal-content { border-radius: 24px 24px 0 0; width: 100%; max-width: 100%; margin: 0; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); padding: 25px 20px 40px 20px; border-bottom: none; }
             .modal.show .modal-content { transform: translateY(0); }
             
             .detail-meta { flex-direction: column; }
@@ -236,8 +222,10 @@
     <div class="glass-panel">
         <div class="calendar-nav">
             <div class="month-control">
-                <button id="prevMonthBtn" class="btn btn-outline btn-icon-only" onclick="changeMonth(-1)" style="display: none; visibility: hidden;">&lt;</button>
-                <h2 class="section-title" id="monthLabel" style="margin: 0; min-width: 150px; justify-content: center;">LOADING...</h2>
+                <button id="prevMonthBtn" class="btn btn-outline btn-icon-only" onclick="changeMonth(-1)" style="visibility: hidden;">&lt;</button>
+                
+                <select id="monthSelect" class="month-dropdown" onchange="selectMonthFromDropdown()"></select>
+
                 <button id="nextMonthBtn" class="btn btn-outline btn-icon-only" onclick="changeMonth(1)">&gt;</button>
             </div>
             
@@ -252,7 +240,8 @@
     </div>
 
     <div class="glass-panel" id="detailSection">
-        <h2 class="section-title">USAGE TREND (MONTHLY)</h2>
+        <h2 class="section-title" style="margin-bottom: 5px;">USAGE TREND (YEARLY)</h2>
+        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">สรุปยอดจำนวนการจองตลอดทั้งปี (แบ่งตามเดือน)</div>
         <div class="chart-container"><canvas id="trendChart"></canvas></div>
         <div id="selectedDateLabel" style="color: var(--primary); margin-bottom: 15px; font-size: 15px; font-weight: 500;">รายละเอียดการจอง (เลือกวันที่)</div>
         <div id="detailsContainer" style="max-height: 400px; overflow-y: auto; padding-right: 5px; scroll-margin-top: 20px;">
@@ -319,21 +308,28 @@
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbygm0JNns8iUFXv73V85OBRk-eji_zvtU61deXV7tWTTFSC1aAv-tln1bQm96gmx-Nm/exec"; 
     
+    // วันหยุด (เพิ่มของปีหน้าเผื่อไว้ได้เลย)
+    const thaiHolidays = {
+        "2026-01-01": "วันขึ้นปีใหม่", "2026-03-03": "วันมาฆบูชา", "2026-04-06": "วันจักรี",
+        "2026-04-13": "วันสงกรานต์", "2026-04-14": "วันสงกรานต์", "2026-04-15": "วันสงกรานต์",
+        "2026-05-01": "วันแรงงาน", "2026-05-04": "วันฉัตรมงคล", "2026-06-03": "วันเฉลิมฯ พระราชินี",
+        "2026-07-28": "วันเฉลิมฯ ร.10", "2026-08-12": "วันแม่แห่งชาติ", "2026-10-13": "วันนวมินทรมหาราช",
+        "2026-10-23": "วันปิยมหาราช", "2026-12-05": "วันพ่อแห่งชาติ", "2026-12-10": "วันรัฐธรรมนูญ", "2026-12-31": "วันสิ้นปี",
+        "2027-01-01": "วันขึ้นปีใหม่" // เผื่อข้ามไปปีหน้า
+    };
+
     function goToMainMenu() {
-        if (isAdmin) {
-            const MAIN_MENU_URL = "https://add00917-hue.github.io/GNR3-Building-MS/"; // <--- ใส่ลิงก์ตรงนี้
-            window.location.href = MAIN_MENU_URL;
-        } else {
-            showToast("⚠️ เฉพาะ Admin เท่านั้นที่สามารถเข้าหน้าเมนูหลักได้", "warning");
-        }
+        if (isAdmin) window.location.href = "https://www.google.com";
+        else showToast("⚠️ เฉพาะ Admin เท่านั้น", "warning");
     }
 
     let bookings = [];
     let isAdmin = false;
     let myChart = null;
     let currentMonthOffset = 0; 
+    const MAX_MONTH_OFFSET = 11; // 💡 กำหนดให้ดูและจองล่วงหน้าได้ 12 เดือน (รวมเดือนปัจจุบัน)
 
-    const adminAccounts = { 'Ponk1': '9068', 'Addi2': '0396', 'Poppy3': '2161' };
+    const adminAccounts = { 'admin1': '1111', 'admin2': '2222', 'admin3': '3333' };
 
     setInterval(() => {
         const clock = document.getElementById('clock');
@@ -377,15 +373,42 @@
         return { am, pm };
     }
 
+    // ✨ สร้างตัวเลือกให้ Dropdown เมื่อเริ่มโปรแกรม
+    function initMonthDropdown() {
+        const select = document.getElementById('monthSelect');
+        select.innerHTML = '';
+        const realNow = new Date();
+        
+        // สร้างตัวเลือกเดือนล่วงหน้า (0 = เดือนนี้, 1 = เดือนหน้า ... ไปเรื่อยๆ 12 เดือน)
+        for(let i = 0; i <= MAX_MONTH_OFFSET; i++) {
+            let d = new Date(realNow.getFullYear(), realNow.getMonth() + i, 1);
+            let opt = document.createElement('option');
+            opt.value = i;
+            opt.text = d.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' });
+            select.appendChild(opt);
+        }
+    }
+
+    // ✨ เมื่อผู้ใช้เปลี่ยนค่าใน Dropdown
+    function selectMonthFromDropdown() {
+        currentMonthOffset = parseInt(document.getElementById('monthSelect').value);
+        resetDetailContainer();
+        renderCalendar();
+    }
+
     function changeMonth(offset) {
         currentMonthOffset += offset;
         if (currentMonthOffset < 0) currentMonthOffset = 0; 
-        if (currentMonthOffset > 1) currentMonthOffset = 1; 
+        if (currentMonthOffset > MAX_MONTH_OFFSET) currentMonthOffset = MAX_MONTH_OFFSET; 
         
+        document.getElementById('monthSelect').value = currentMonthOffset; // อัปเดต Dropdown ให้ตรงกัน
+        resetDetailContainer();
+        renderCalendar();
+    }
+    
+    function resetDetailContainer() {
         document.getElementById('detailsContainer').innerHTML = `<div style="text-align:center; color:var(--text-muted); padding: 30px;">คลิกที่วันที่ในปฏิทินเพื่อดูข้อมูล</div>`;
         document.getElementById('selectedDateLabel').innerText = `รายละเอียดการจอง (เลือกวันที่)`;
-        
-        renderCalendar();
     }
 
     function renderCalendar() {
@@ -398,78 +421,83 @@
         const displayDate = new Date(realNow.getFullYear(), realNow.getMonth() + currentMonthOffset, 1);
         const year = displayDate.getFullYear();
         const month = displayDate.getMonth();
-        
         const todayStr = `${realNow.getFullYear()}-${String(realNow.getMonth()+1).padStart(2, '0')}-${String(realNow.getDate()).padStart(2, '0')}`;
         
-        document.getElementById('monthLabel').innerHTML = `
-            <svg viewBox="0 0 24 24" style="width:20px;fill:currentColor; margin-right:5px; vertical-align:text-bottom;"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg> 
-            ${displayDate.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' })}
-        `;
-        
-        // จัดการซ่อน/แสดงปุ่มเปลี่ยนเดือน แบบจองพื้นที่ไว้ไม่ให้เลื่อนไปมา
+        // ซ่อน-โชว์ปุ่มลูกศร
         const prevBtn = document.getElementById('prevMonthBtn');
         const nextBtn = document.getElementById('nextMonthBtn');
-        
-        if(currentMonthOffset > 0) {
-            prevBtn.style.display = 'inline-flex';
-            prevBtn.style.visibility = 'visible';
-        } else {
-            prevBtn.style.visibility = 'hidden'; // ซ่อนแต่ยังกินพื้นที่อยู่
-        }
-        
-        if(currentMonthOffset < 1) {
-            nextBtn.style.display = 'inline-flex';
-            nextBtn.style.visibility = 'visible';
-        } else {
-            nextBtn.style.visibility = 'hidden';
-        }
+        prevBtn.style.visibility = (currentMonthOffset > 0) ? 'visible' : 'hidden';
+        nextBtn.style.visibility = (currentMonthOffset < MAX_MONTH_OFFSET) ? 'visible' : 'hidden';
 
         const firstDayIndex = displayDate.getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
 
         for(let i = 0; i < firstDayIndex; i++) { cal.innerHTML += `<div></div>`; }
 
-        let chartData = Array(daysInMonth).fill(0);
-
         for (let i = 1; i <= daysInMonth; i++) {
             const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-            const dayData = bookings.filter(b => b.Date && b.Date.split('T')[0] === dateStr && b.Status !== 'rejected' && b.Status !== 'cancelled');
+            const dayOfWeek = new Date(year, month, i).getDay();
+            const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+            const holidayName = thaiHolidays[dateStr];
             
-            chartData[i-1] = dayData.length;
-            const slots = analyzeSlot(dayData);
             const isTodayClass = (dateStr === todayStr) ? 'is-today' : '';
-
             const card = document.createElement('div');
-            card.className = `day-card ${isTodayClass}`;
-            card.innerHTML = `
-                <div class="day-num">${i}</div>
-                <div class="slots-container">
-                    <div class="slot-badge ${slots.am.class}">เช้า</div>
-                    <div class="slot-badge ${slots.pm.class}">บ่าย</div>
-                </div>
-            `;
-            const rawDayData = bookings.filter(b => b.Date && b.Date.split('T')[0] === dateStr);
-            card.onclick = () => showDetails(dateStr, rawDayData, i);
+            
+            if (holidayName || isWeekend) {
+                card.className = `day-card day-disabled ${isTodayClass}`;
+                let label = holidayName 
+                    ? `<div class="holiday-text">${holidayName}</div>` 
+                    : `<div class="weekend-text">หยุดเสาร์-อาทิตย์</div>`;
+                
+                card.innerHTML = `<div class="day-num" style="color: ${holidayName ? '#f87171' : 'var(--text-muted)'}">${i}</div>${label}`;
+                card.onclick = () => showToast(`❌ ไม่อนุญาตให้จอง: ${holidayName ? holidayName : 'ปิดให้บริการวันเสาร์-อาทิตย์'}`, 'error');
+            } else {
+                const dayData = bookings.filter(b => b.Date && b.Date.split('T')[0] === dateStr && b.Status !== 'rejected' && b.Status !== 'cancelled');
+                const slots = analyzeSlot(dayData);
+                card.className = `day-card ${isTodayClass}`;
+                card.innerHTML = `
+                    <div class="day-num">${i}</div>
+                    <div class="slots-container">
+                        <div class="slot-badge ${slots.am.class}">เช้า</div>
+                        <div class="slot-badge ${slots.pm.class}">บ่าย</div>
+                    </div>
+                `;
+                const rawDayData = bookings.filter(b => b.Date && b.Date.split('T')[0] === dateStr);
+                card.onclick = () => showDetails(dateStr, rawDayData, i);
+            }
             cal.appendChild(card);
         }
 
-        renderChart(chartData, daysInMonth, displayDate);
+        renderYearlyChart(displayDate);
     }
 
-    function renderChart(dataArr, daysInMonth, displayDate) {
+    function renderYearlyChart(displayDate) {
         const ctx = document.getElementById('trendChart').getContext('2d');
-        const labels = Array.from({length: daysInMonth}, (_, i) => i + 1);
+        const targetYear = displayDate.getFullYear();
+        
+        const monthLabels = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+        let yearlyData = Array(12).fill(0);
+        
+        bookings.forEach(b => {
+            if (b.Status === 'rejected' || b.Status === 'cancelled') return;
+            if (!b.Date) return;
+            
+            const bYear = parseInt(b.Date.split('-')[0]);
+            const bMonth = parseInt(b.Date.split('-')[1]) - 1; 
+            
+            if (bYear === targetYear) yearlyData[bMonth]++;
+        });
+
         if (myChart) myChart.destroy();
 
         let gradient = ctx.createLinearGradient(0, 0, 0, 200);
-        gradient.addColorStop(0, 'rgba(56, 189, 248, 0.5)');
-        gradient.addColorStop(1, 'rgba(56, 189, 248, 0.0)');
-
-        const monthName = displayDate.toLocaleDateString('th-TH', { month: 'short' });
+        gradient.addColorStop(0, 'rgba(56, 189, 248, 0.9)');
+        gradient.addColorStop(1, 'rgba(56, 189, 248, 0.2)');
 
         myChart = new Chart(ctx, {
-            type: 'line', data: { labels: labels, datasets: [{ label: `การจองเดือน ${monthName}`, data: dataArr, borderColor: '#38bdf8', backgroundColor: gradient, borderWidth: 2, pointBackgroundColor: '#0a0f18', fill: true, tension: 0.4 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(255,255,255,0.05)' } }, y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { stepSize: 1 } } } }
+            type: 'bar', 
+            data: { labels: monthLabels, datasets: [{ label: `จำนวนคิวจองปี ${targetYear}`, data: yearlyData, backgroundColor: gradient, borderRadius: 6, borderWidth: 0, barPercentage: 0.6 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false, color: 'rgba(255,255,255,0.05)' } }, y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { stepSize: 1, precision: 0 } } } }
         });
     }
 
@@ -487,6 +515,7 @@
                  return;
             }
 
+            initMonthDropdown(); // สร้างตัวเลือก Dropdown ครั้งแรก
             renderCalendar();
             
             if(isAdmin && document.getElementById('adminDashModal').classList.contains('show')) {
@@ -554,34 +583,34 @@
 
     async function submitBooking() {
         const btn = document.getElementById('submitBtn');
+        const inputDate = document.getElementById('formDate').value;
         const slot = document.getElementById('timeSlot').value;
+        
+        if (inputDate) {
+            const dateObj = new Date(inputDate);
+            const dayOfWeek = dateObj.getDay();
+            if (dayOfWeek === 0 || dayOfWeek === 6) { showToast("❌ ไม่สามารถจองในวันหยุดเสาร์-อาทิตย์ได้", "error"); return; }
+            if (thaiHolidays[inputDate]) { showToast(`❌ ไม่สามารถจองได้: เป็นวันหยุด (${thaiHolidays[inputDate]})`, "error"); return; }
+        }
+
         let st = "08:00", ed = "12:00";
         if (slot === 'afternoon') { st = "13:00"; ed = "18:00"; }
         else if (slot === 'fullday') { st = "08:00"; ed = "18:00"; }
 
         const data = { 
-            action: 'create', 
-            Date: document.getElementById('formDate').value, 
-            startTime: st, 
-            stopTime: ed, 
-            subject: document.getElementById('formSubject').value, 
-            detail: document.getElementById('formDetail').value || "-", 
-            user: document.getElementById('formUser').value, 
-            phone: document.getElementById('formPhone').value 
+            action: 'create', Date: inputDate, startTime: st, stopTime: ed, 
+            subject: document.getElementById('formSubject').value, detail: document.getElementById('formDetail').value || "-", 
+            user: document.getElementById('formUser').value, phone: document.getElementById('formPhone').value 
         };
 
         if (!data.Date || !data.subject || !data.user) { showToast("โปรดกรอกข้อมูลสำคัญให้ครบถ้วน", "warning"); return; }
         btn.innerText = "กำลังบันทึก..."; btn.disabled = true;
 
         try {
-            const res = await fetch(API_URL, { 
-                method: 'POST', 
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify(data) 
-            });
+            const res = await fetch(API_URL, { method: 'POST', headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(data) });
             const result = await res.json();
             
-            if (result.status === 'error') { showToast(result.msg, "error"); } 
+            if (result.status === 'error') showToast(result.msg, "error");
             else { 
                 showToast("✅ บันทึกข้อมูลเสร็จแล้ว!", "success"); 
                 document.getElementById('formDetail').value = '';
@@ -593,79 +622,44 @@
     }
 
     function handleAdminClick() {
-        if (isAdmin) {
-            renderAdminDashboard();
-            document.getElementById('adminDashModal').classList.add('show');
-        } else {
-            document.getElementById('loginUser').value = '';
-            document.getElementById('loginPass').value = '';
-            document.getElementById('loginModal').classList.add('show');
-        }
+        if (isAdmin) { renderAdminDashboard(); document.getElementById('adminDashModal').classList.add('show'); } 
+        else { document.getElementById('loginUser').value = ''; document.getElementById('loginPass').value = ''; document.getElementById('loginModal').classList.add('show'); }
     }
 
     function checkLogin() {
-        const u = document.getElementById('loginUser').value;
-        const p = document.getElementById('loginPass').value;
+        const u = document.getElementById('loginUser').value; const p = document.getElementById('loginPass').value;
         
         if (adminAccounts[u] && adminAccounts[u] === p) {
-            isAdmin = true;
-            showToast(`✅ ยินดีต้อนรับ แอดมิน ${u}`, 'success');
-            closeModal('loginModal');
-            document.getElementById('adminBtn').style.borderColor = "var(--primary)";
-            document.getElementById('adminBtn').style.color = "var(--primary)";
-            document.getElementById('adminBtnText').innerText = "DASHBOARD";
+            isAdmin = true; showToast(`✅ ยินดีต้อนรับ แอดมิน ${u}`, 'success'); closeModal('loginModal');
+            document.getElementById('adminBtn').style.borderColor = "var(--primary)"; document.getElementById('adminBtn').style.color = "var(--primary)"; document.getElementById('adminBtnText').innerText = "DASHBOARD";
             
-            const homeBtn = document.getElementById('homeBtn');
-            if(homeBtn) {
-                homeBtn.style.display = "flex";
-            }
-            
-            handleAdminClick();
-            renderCalendar();
-        } else {
-            showToast('❌ Username หรือ Password ไม่ถูกต้อง', 'error');
-        }
+            const homeBtn = document.getElementById('homeBtn'); if(homeBtn) homeBtn.style.display = "flex";
+            handleAdminClick(); renderCalendar();
+        } else showToast('❌ Username หรือ Password ไม่ถูกต้อง', 'error');
     }
 
     function logoutAdmin() {
-        isAdmin = false;
-        showToast('ออกจากระบบแอดมินแล้ว', 'warning');
-        closeModal('adminDashModal');
-        document.getElementById('adminBtn').style.borderColor = "rgba(255,255,255,0.2)";
-        document.getElementById('adminBtn').style.color = "var(--text-main)";
-        document.getElementById('adminBtnText').innerText = "ADMIN";
+        isAdmin = false; showToast('ออกจากระบบแอดมินแล้ว', 'warning'); closeModal('adminDashModal');
+        document.getElementById('adminBtn').style.borderColor = "rgba(255,255,255,0.2)"; document.getElementById('adminBtn').style.color = "var(--text-main)"; document.getElementById('adminBtnText').innerText = "ADMIN";
         
-        const homeBtn = document.getElementById('homeBtn');
-        if(homeBtn) {
-            homeBtn.style.display = "none";
-        }
-        
-        renderCalendar();
-        document.getElementById('detailsContainer').innerHTML = `<div style="text-align:center; color:var(--text-muted); padding: 30px;">คลิกที่วันที่ในปฏิทินเพื่อดูข้อมูล</div>`;
+        const homeBtn = document.getElementById('homeBtn'); if(homeBtn) homeBtn.style.display = "none";
+        renderCalendar(); resetDetailContainer();
     }
 
     function renderAdminDashboard() {
         const container = document.getElementById('pendingListContainer');
         const pending = bookings.filter(b => b.Status === 'pending');
         
-        if (pending.length === 0) {
-            container.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:40px;">✅ ไม่มีรายการรออนุมัติ ในขณะนี้</div>';
-            return;
-        }
+        if (pending.length === 0) { container.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:40px;">✅ ไม่มีรายการรออนุมัติ ในขณะนี้</div>'; return; }
 
         container.innerHTML = '';
         pending.sort((a,b) => new Date(a.Date) - new Date(b.Date)).forEach(b => {
             const dateFmt = b.Date ? b.Date.split('T')[0] : 'ไม่ระบุวันที่';
-            
-            const detailHtml = (b.Detail && b.Detail !== "-" && b.Detail.trim() !== "") 
-                ? `<div style="color:#cbd5e1; font-size:13px; margin-bottom:8px; background: rgba(0,0,0,0.2); padding: 8px 10px; border-radius: 6px; border-left: 3px solid var(--primary);">📝 ${b.Detail}</div>` 
-                : '';
+            const detailHtml = (b.Detail && b.Detail !== "-" && b.Detail.trim() !== "") ? `<div style="color:#cbd5e1; font-size:13px; margin-bottom:8px; background: rgba(0,0,0,0.2); padding: 8px 10px; border-radius: 6px; border-left: 3px solid var(--primary);">📝 ${b.Detail}</div>` : '';
 
             container.innerHTML += `
                 <div class="detail-item pending" style="margin-bottom: 15px;">
-                    <div class="detail-meta">
-                        <strong style="color:var(--primary); font-size:15px;">📅 ${dateFmt} | ⏰ ${b['Start Time']} - ${b.StopTime}</strong>
-                    </div>
+                    <div class="detail-meta"><strong style="color:var(--primary); font-size:15px;">📅 ${dateFmt} | ⏰ ${b['Start Time']} - ${b.StopTime}</strong></div>
                     <div style="color:#fff; font-size:16px; font-weight:500; margin-bottom:6px;">${b.Subject}</div>
                     ${detailHtml}
                     <div style="color:var(--text-muted); font-size:13px;">👤 ผู้จอง: ${b.User} | 📞 ${(b.Phone||"").replace(/'/g,'')}</div>
@@ -685,28 +679,19 @@
         if(!confirm(`ยืนยันที่จะ ${msg} รายการนี้?`)) return;
         
         showToast(`กำลัง ${msg}...`, "warning");
-        
         try {
-            await fetch(API_URL, { 
-                method: 'POST', 
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify({ action: 'update', id: id, status: status }) 
-            });
-            showToast(`✅ ${msg} เรียบร้อยแล้ว`, "success");
-            fetchData(); 
-        } catch(e) {
-            showToast(`❌ อัปเดตล้มเหลว ตรวจสอบการเชื่อมต่อ`, "error");
-        }
+            await fetch(API_URL, { method: 'POST', headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: 'update', id: id, status: status }) });
+            showToast(`✅ ${msg} เรียบร้อยแล้ว`, "success"); fetchData(); 
+        } catch(e) { showToast(`❌ อัปเดตล้มเหลว ตรวจสอบการเชื่อมต่อ`, "error"); }
     }
 
     function openBooking() { document.getElementById('bookingModal').classList.add('show'); }
     function openBookingWithDate(d) { document.getElementById('formDate').value = d; openBooking(); }
     
     function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-    window.onclick = function(event) {
-        if (event.target.classList.contains('modal')) { event.target.classList.remove('show'); }
-    }
+    window.onclick = function(event) { if (event.target.classList.contains('modal')) event.target.classList.remove('show'); }
 
+    // Start
     fetchData();      
 </script>
 </body>
