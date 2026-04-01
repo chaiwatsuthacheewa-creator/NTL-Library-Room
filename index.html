@@ -18,9 +18,9 @@
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             
-            --color-free: #34d399;
-            --color-booked: #fb7185;
-            --color-pending: #fbbf24;
+            --color-free: #10b981; /* เขียว */
+            --color-booked: #f43f5e; /* แดงอมชมพู */
+            --color-pending: #f59e0b; /* ส้ม */
 
             --sub-bg: rgba(0,0,0,0.25);
             --sub-border: rgba(255,255,255,0.08);
@@ -56,8 +56,6 @@
             --bg-gradient: radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.05), transparent 25%), radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.03), transparent 25%);
             --shadow-base: rgba(139, 92, 246, 0.15);
         }
-
-        /* ================================================= */
 
         * { box-sizing: border-box; }
 
@@ -121,13 +119,27 @@
         .day-num { font-size: 18px; font-weight: 600; color: var(--day-num); width: 100%; margin-bottom: 5px; line-height: 1; transition: 0.3s;}
         .day-disabled .day-num { text-align: center; margin-bottom: 0; }
         
-        .slots-container { display: flex; flex-direction: column; gap: 5px; width: 100%; margin-top: auto; overflow-y: auto; scrollbar-width: none;}
+        .slots-container { display: flex; flex-direction: column; gap: 6px; width: 100%; margin-top: auto; overflow-y: auto; scrollbar-width: none;}
         .slots-container::-webkit-scrollbar { display: none; }
-        .slot-badge { font-size: 12px; padding: 6px 8px; border-radius: 4px; text-align: left; font-weight: 600; border-left: 3px solid transparent; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: 0.5px; transition: 0.3s;}
         
-        .slot-free { border-left-color: var(--color-free); color: var(--text-main); background: linear-gradient(90deg, rgba(16, 185, 129, 0.2) 0%, transparent 60%); }
-        .slot-booked { border-left-color: var(--color-booked); color: #fff; background: linear-gradient(90deg, rgba(239, 68, 68, 0.6) 0%, transparent 80%); text-shadow: 0 0 4px rgba(0,0,0,0.5); }
-        .slot-pending { border-left-color: var(--color-pending); color: #fff; background: linear-gradient(90deg, rgba(245, 158, 11, 0.6) 0%, transparent 80%); text-shadow: 0 0 4px rgba(0,0,0,0.5); }
+        /* 🔥 รูปแบบใหม่: Solid Fill + SVG Icons 🔥 */
+        .slot-badge { 
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            font-size: 12px; font-weight: 500; padding: 6px 4px; border-radius: 6px; 
+            width: 100%; box-sizing: border-box; color: #fff;
+            white-space: normal; /* ยอมให้ขึ้นบรรทัดใหม่ */
+            word-wrap: break-word; /* ตัดคำถ้าไม่มีที่ */
+            line-height: 1.2;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            transition: 0.3s;
+        }
+        .slot-badge svg { width: 14px; height: 14px; flex-shrink: 0; }
+        .slot-text { flex-shrink: 1; } /* ยืดหยุ่นได้เมื่อพื้นที่แคบ */
+
+        .slot-free { background: linear-gradient(135deg, #10b981, #059669); }
+        .slot-booked { background: linear-gradient(135deg, #f43f5e, #e11d48); }
+        .slot-pending { background: linear-gradient(135deg, #f59e0b, #d97706); }
 
         /* BUTTONS & INPUTS */
         .btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border-radius: 10px; border: none; font-family: 'Kanit'; font-weight: 500; cursor: pointer; transition: all 0.2s; font-size: 15px; flex-shrink: 0; outline: none; width: 100%; }
@@ -174,7 +186,10 @@
             .calendar-grid { grid-template-columns: 0.6fr 1fr 1fr 1fr 1fr 1fr 0.6fr; gap: 6px; height: auto;}
             .day-card { padding: 8px 6px; min-height: 110px; height: auto;}
             .day-num { font-size: 16px; }
-            .slot-badge { font-size: 11px; padding: 4px 4px; }
+            
+            /* ปรับ Slot บน iPad */
+            .slot-badge { font-size: 11px; padding: 4px 2px; gap: 4px; }
+            .slot-badge svg { width: 12px; height: 12px; }
         }
 
         /* ================= MOBILE ปลดล็อก SCROLL ================= */
@@ -201,8 +216,12 @@
             .day-header { font-size: 11px; padding: 4px 0; border-radius: 4px; }
             .day-card { padding: 4px; border-radius: 6px; border-width: 1px; min-height: 95px; height: auto;}
             .day-num { font-size: 13px; margin-bottom: 2px; text-align: center;}
-            .slots-container { gap: 2px; }
-            .slot-badge { font-size: 9px; padding: 2px; text-align: center; border-radius: 4px; border-left: none; box-shadow: 0 1px 2px rgba(0,0,0,0.3); line-height: 1.1; }
+            .slots-container { gap: 4px; }
+            
+            /* ปรับ Slot บนมือถือจิ๋ว (ป้องกันข้อความตกหล่น) */
+            .slot-badge { font-size: 10px; padding: 3px 1px; gap: 2px; border-radius: 4px; }
+            .slot-badge svg { width: 10px; height: 10px; }
+            
             .holiday-text { font-size: 8px; padding: 2px; border-radius: 4px; line-height: 1.1; margin-top: 2px;}
             .weekend-text { font-size: 8px; margin-top: 2px;}
             .modal { align-items: flex-end; padding: 0; }
@@ -340,6 +359,10 @@
         "2026-10-23": "ปิยมหาราช", "2026-12-05": "วันพ่อ", "2026-12-10": "รัฐธรรมนูญ", "2026-12-31": "สิ้นปี"
     };
 
+    // SVG Icons
+    const iconSun = `<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>`;
+    const iconMoon = `<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>`;
+
     function goToMainMenu() { window.location.href = "https://add00917-hue.github.io/GNR3-Building-MS/"; }
 
     let bookings = [];
@@ -370,17 +393,14 @@
         if(!iconPath || !text) return;
         
         if (theme === 'light') {
-            // โลโก้พระจันทร์ (เพื่อกดกลับไปโหมดกลางคืน)
             iconPath.setAttribute('d', 'M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z');
             text.innerText = 'โหมดกลางคืน';
         } else {
-            // โลโก้พระอาทิตย์ (เพื่อกดไปโหมดสว่าง)
             iconPath.setAttribute('d', 'M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z');
             text.innerText = 'โหมดสว่าง';
         }
     }
 
-    // อัปเดตเวลาและวันที่แบบ Real-time
     setInterval(() => {
         const now = new Date();
         const clock = document.getElementById('clock');
@@ -485,13 +505,20 @@
                 const dayData = bookings.filter(b => b.Date && b.Date.split('T')[0] === dateStr && b.Status !== 'rejected' && b.Status !== 'cancelled');
                 const slots = analyzeSlot(dayData);
                 card.className = `day-card ${isTodayClass}`;
+                
+                // HTML ของช่องสถานะแบบ A (Solid Fill + SVG)
                 card.innerHTML = `
                     <div class="day-num">${i}</div>
                     <div class="slots-container">
-                        <div class="slot-badge ${slots.am.class}">เช้า</div>
-                        <div class="slot-badge ${slots.pm.class}">บ่าย</div>
+                        <div class="slot-badge ${slots.am.class}">
+                            ${iconSun} <span class="slot-text">เช้า</span>
+                        </div>
+                        <div class="slot-badge ${slots.pm.class}">
+                            ${iconMoon} <span class="slot-text">บ่าย</span>
+                        </div>
                     </div>
                 `;
+                
                 const rawDayData = bookings.filter(b => b.Date && b.Date.split('T')[0] === dateStr);
                 card.onclick = () => showDetails(dateStr, rawDayData);
             }
@@ -500,7 +527,7 @@
     }
 
     async function initSystem() {
-        initTheme(); // โหลดธีมก่อนเพื่อน
+        initTheme(); 
         initMonthDropdown();
         renderCalendar(); 
         await syncDataSilently(true); 
@@ -535,6 +562,7 @@
         }
     }
 
+    // ซิงค์ข้อมูลเบื้องหลังทุก 10 วินาที
     setInterval(() => syncDataSilently(false), 10000); 
 
     function showDetails(dateStr, rawDayData) {
@@ -614,7 +642,6 @@
             document.getElementById('adminBtn').style.color = "var(--primary)"; 
             document.getElementById('adminBtnText').innerText = "DASHBOARD";
             
-            // เปิดปุ่มหน้าหลักเฉพาะตอนเป็น Admin
             document.getElementById('homeBtn').style.display = 'flex';
             
             handleAdminClick(); 
@@ -630,7 +657,6 @@
         document.getElementById('adminBtn').style.color = "var(--text-main)"; 
         document.getElementById('adminBtnText').innerText = "ADMIN";
         
-        // ซ่อนปุ่มหน้าหลักเมื่อออกจากระบบ
         document.getElementById('homeBtn').style.display = 'none';
         
         renderCalendar();
