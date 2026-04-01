@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>NTL Library Pro System</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --bg-base: #0a0f18;
@@ -21,6 +20,8 @@
             --color-pending: #f59e0b;
         }
 
+        * { box-sizing: border-box; }
+
         body {
             margin: 0; padding: 20px; font-family: 'Kanit', sans-serif;
             background-color: var(--bg-base); color: var(--text-main);
@@ -31,102 +32,120 @@
             overscroll-behavior-y: none; 
         }
 
-        .glass-panel { background: var(--panel-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--panel-border); border-radius: 16px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); padding: 20px; }
+        .glass-panel { background: var(--panel-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--panel-border); border-radius: 16px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); padding: 25px; }
         
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; gap: 15px; flex-wrap: wrap; }
-        .title-box { display: flex; align-items: center; gap: 15px; }
-        .sys-icon { width: 45px; height: 45px; fill: var(--primary); filter: drop-shadow(0 0 8px var(--primary-glow)); flex-shrink: 0; }
-        .title { margin: 0; font-size: 28px; font-weight: 600; letter-spacing: 1px; color: #fff; line-height: 1.2; }
-        .subtitle { font-size: 14px; color: var(--text-muted); font-weight: 400; letter-spacing: 0.5px; margin-top: 4px;}
-        
-        .header-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
-        #clock { font-size: 20px; color: var(--primary); font-weight: 300; margin-right: 15px; font-variant-numeric: tabular-nums; }
+        /* ================= LAYOUT หลัก (แถบซ้าย + ปฏิทินขวา) ================= */
+        .app-container {
+            display: flex; gap: 25px;
+            max-width: 1600px; /* ขยายให้รองรับจอกว้างๆ แบบเต็มตา */
+            margin: 0 auto;
+            min-height: calc(100vh - 40px);
+            align-items: stretch;
+        }
 
-        .dashboard { display: grid; grid-template-columns: 2fr 1.2fr; gap: 25px; align-items: start; padding-bottom: 40px; }
-        .section-title { font-size: 16px; font-weight: 500; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; margin: 0; display: flex; align-items: center; gap: 8px; }
+        /* 👈 แถบเมนูด้านซ้าย (Sidebar) */
+        .sidebar {
+            width: 300px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+        }
         
-        .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 15px; }
+        .sidebar .title-box { display: flex; align-items: flex-start; gap: 15px; flex-direction: column; }
+        .sidebar .title-header-row { display: flex; align-items: center; gap: 15px; width: 100%;}
+        .sys-icon { width: 50px; height: 50px; fill: var(--primary); filter: drop-shadow(0 0 8px var(--primary-glow)); flex-shrink: 0; }
+        .title { margin: 0; font-size: 24px; font-weight: 600; letter-spacing: 1px; color: #fff; line-height: 1.2; word-break: break-word;}
+        .subtitle { font-size: 13px; color: var(--text-muted); font-weight: 400; letter-spacing: 0.5px; margin-top: 15px; line-height: 1.6; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); width: 100%;}
+        
+        /* ⏰ กรอบแสดง วันที่ และ เวลา */
+        .time-container { text-align: center; margin: 30px 0 20px 0; }
+        #dateDisplay { font-size: 15px; color: var(--text-muted); font-weight: 400; letter-spacing: 0.5px; margin-bottom: 5px; }
+        #clock { font-size: 32px; color: var(--primary); font-weight: 300; margin: 0; font-variant-numeric: tabular-nums; letter-spacing: 2px; text-shadow: 0 0 15px var(--primary-glow); line-height: 1; }
+
+        /* ปุ่มต่างๆ ย้ายมาต่อจากเวลา */
+        .sidebar-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 0; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); }
+
+        /* 👉 พื้นที่หลักปฏิทินขวา (Main Content) */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
         
         .month-control { display: flex; align-items: center; gap: 10px; }
-        .btn-icon-only { padding: 6px 14px; border-radius: 8px; font-size: 16px; font-weight: bold; }
+        .btn-icon-only { padding: 8px 16px; border-radius: 8px; font-size: 16px; font-weight: bold; }
 
-        /* ✨ สไตล์สำหรับ Dropdown เลือกเดือน */
         .month-dropdown {
-            font-size: 16px;
-            font-weight: 500;
-            color: var(--primary);
-            background: rgba(0,0,0,0.4);
-            border: 1px solid rgba(56, 189, 248, 0.4);
-            border-radius: 8px;
-            padding: 6px 12px;
-            font-family: 'Kanit', sans-serif;
-            cursor: pointer;
-            outline: none;
-            text-align: center;
-            min-width: 160px;
-            transition: 0.3s;
+            font-size: 18px; font-weight: 500; color: var(--primary);
+            background: rgba(0,0,0,0.4); border: 1px solid rgba(56, 189, 248, 0.4);
+            border-radius: 8px; padding: 8px 15px; font-family: 'Kanit', sans-serif;
+            cursor: pointer; outline: none; text-align: center; min-width: 200px; transition: 0.3s;
         }
-        .month-dropdown:hover, .month-dropdown:focus { border-color: var(--primary); background: rgba(0,0,0,0.6); box-shadow: 0 0 10px rgba(56, 189, 248, 0.2); }
-        .month-dropdown option { background: var(--bg-base); color: #fff; font-size: 15px; }
+        .month-dropdown:hover, .month-dropdown:focus { border-color: var(--primary); background: rgba(0,0,0,0.6); box-shadow: 0 0 15px rgba(56, 189, 248, 0.3); }
+        .month-dropdown option { background: var(--bg-base); color: #fff; font-size: 16px; }
 
         .status-legend {
             display: flex; gap: 15px; align-items: center; flex-wrap: wrap;
-            padding: 10px 15px; background: rgba(0,0,0,0.25); 
+            padding: 12px 20px; background: rgba(0,0,0,0.25); 
             border: 1px solid rgba(255,255,255,0.05); border-radius: 12px;
         }
-        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-muted); font-weight: 400; }
-        .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--text-muted); font-weight: 400; }
+        .legend-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
         .dot-free { background: var(--color-free); box-shadow: 0 0 8px rgba(16, 185, 129, 0.6); }
         .dot-pending { background: var(--color-pending); box-shadow: 0 0 8px rgba(245, 158, 11, 0.6); }
         .dot-booked { background: var(--color-booked); box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
 
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+        /* CALENDAR GRID */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; flex-grow: 1; align-content: start; }
         
-        .day-header { text-align: center; font-size: 14px; font-weight: 600; padding: 10px 0; letter-spacing: 1px; border-radius: 8px; margin-bottom: 5px; }
-        .day-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 10px; min-height: 110px; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; justify-content: flex-start; position: relative; overflow: hidden; }
-        .day-card:active { transform: scale(0.96); } 
-        .day-card:hover { border-color: var(--primary); box-shadow: 0 5px 15px var(--primary-glow); }
+        .day-header { text-align: center; font-size: 16px; font-weight: 600; padding: 12px 0; letter-spacing: 1px; border-radius: 8px; margin-bottom: 5px; }
+        .day-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 12px; min-height: 130px; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; justify-content: flex-start; position: relative; overflow: hidden; }
+        .day-card:active { transform: scale(0.97); } 
+        .day-card:hover { border-color: var(--primary); box-shadow: 0 5px 15px var(--primary-glow); background: rgba(56, 189, 248, 0.05); }
         .day-card.is-today { background: rgba(56, 189, 248, 0.1); border: 1px solid var(--primary); box-shadow: inset 0 0 20px rgba(56, 189, 248, 0.2); }
-        .day-card.is-today .day-num { color: var(--primary); text-shadow: 0 0 10px var(--primary-glow); }
+        .day-card.is-today .day-num { color: var(--primary); text-shadow: 0 0 10px var(--primary-glow); font-size: 24px;}
         
-        .day-disabled { background: rgba(255,255,255,0.01); border-color: rgba(255,255,255,0.02); opacity: 0.7; cursor: not-allowed; justify-content: center; align-items: center; }
-        .day-disabled:hover { border-color: rgba(255,255,255,0.02); box-shadow: none; transform: none; }
-        .day-disabled:active { transform: none; }
-        .holiday-text { font-size: 11px; color: #fca5a5; text-align: center; line-height: 1.2; font-weight: 500; margin-top: 5px; background: rgba(239, 68, 68, 0.15); padding: 4px; border-radius: 4px; width: 100%; box-sizing: border-box;}
-        .weekend-text { font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 5px; }
+        .day-disabled { background: rgba(255,255,255,0.01); border-color: rgba(255,255,255,0.02); opacity: 0.6; cursor: not-allowed; justify-content: center; align-items: center; }
+        .day-disabled:hover { border-color: rgba(255,255,255,0.02); box-shadow: none; transform: none; background: rgba(255,255,255,0.01); }
+        .holiday-text { font-size: 13px; color: #fca5a5; text-align: center; line-height: 1.3; font-weight: 500; margin-top: 5px; background: rgba(239, 68, 68, 0.15); padding: 4px 6px; border-radius: 6px; width: 100%; word-break: break-word; }
+        .weekend-text { font-size: 13px; color: var(--text-muted); text-align: center; margin-top: 5px; }
         
-        .day-num { font-size: 18px; font-weight: 600; color: #e2e8f0; width: 100%; }
-        .day-disabled .day-num { text-align: center; }
+        .day-num { font-size: 20px; font-weight: 600; color: #e2e8f0; width: 100%; margin-bottom: 8px; }
+        .day-disabled .day-num { text-align: center; margin-bottom: 0; }
         
-        .slots-container { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; width: 100%; }
-        .slot-badge { font-size: 13px; padding: 6px 8px; border-radius: 6px; text-align: left; font-weight: 600; letter-spacing: 0px; border-left: 4px solid transparent; transition: all 0.3s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .slots-container { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: auto;}
+        .slot-badge { font-size: 13px; padding: 6px 10px; border-radius: 6px; text-align: left; font-weight: 600; border-left: 4px solid transparent; transition: all 0.3s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
         .slot-free { border-left-color: var(--color-free); color: rgba(255,255,255,0.6); background: linear-gradient(90deg, rgba(16, 185, 129, 0.2) 0%, transparent 60%); }
         .slot-booked { border-left-color: var(--color-booked); color: #fff; background: linear-gradient(90deg, rgba(239, 68, 68, 0.5) 0%, transparent 80%); text-shadow: 0 0 4px rgba(0,0,0,0.8); }
         .slot-pending { border-left-color: var(--color-pending); color: #fff; background: linear-gradient(90deg, rgba(245, 158, 11, 0.5) 0%, transparent 80%); text-shadow: 0 0 4px rgba(0,0,0,0.8); }
 
-        .chart-container { position: relative; height: 220px; width: 100%; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 20px; }
-        .detail-item { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 12px; border-left: 4px solid var(--color-free); transition: 0.2s; word-wrap: break-word; }
-        .detail-item.booked { border-left-color: var(--color-booked); }
-        .detail-item.pending { border-left-color: var(--color-pending); }
-        .detail-meta { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; flex-wrap: wrap; gap: 5px; }
-        
-        .btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border-radius: 10px; border: none; font-family: 'Kanit'; font-weight: 500; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); font-size: 14px; flex-shrink: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+        /* BUTTONS & INPUTS */
+        .btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 20px; border-radius: 10px; border: none; font-family: 'Kanit'; font-weight: 500; cursor: pointer; transition: all 0.2s; font-size: 15px; flex-shrink: 0; outline: none; -webkit-tap-highlight-color: transparent; width: 100%; }
         .btn:active { transform: scale(0.95); }
         .btn svg { width: 18px; height: 18px; fill: currentColor; flex-shrink: 0; }
-        .btn-primary { background: var(--primary); color: #000; box-shadow: 0 0 15px rgba(56, 189, 248, 0.3); }
+        .btn-primary { background: var(--primary); color: #000; box-shadow: 0 0 15px rgba(56, 189, 248, 0.3); font-size: 16px; }
         .btn-primary:hover { background: #7dd3fc; box-shadow: 0 0 20px rgba(56, 189, 248, 0.5); }
         .btn-outline { background: transparent; color: var(--text-main); border: 1px solid rgba(255,255,255,0.2); }
         .btn-outline:hover { background: rgba(255,255,255,0.05); }
 
-        input, select, textarea { width: 100%; padding: 14px 15px; margin: 8px 0 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.4); color: #fff; font-family: 'Kanit'; font-size: 15px; box-sizing: border-box; transition: 0.3s; outline: none; -webkit-appearance: none; appearance: none; }
+        input, select, textarea { width: 100%; padding: 14px 15px; margin: 8px 0 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.4); color: #fff; font-family: 'Kanit'; font-size: 15px; transition: 0.3s; outline: none; -webkit-appearance: none; appearance: none; }
         input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2); background: rgba(0,0,0,0.6); }
         textarea { resize: vertical; min-height: 80px; }
         
+        /* MODALS */
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 1000; opacity: 0; transition: opacity 0.3s; padding: 20px; }
         .modal.show { display: flex; opacity: 1; }
-        .modal-content { background: var(--bg-base); border: 1px solid var(--panel-border); padding: 25px; border-radius: 20px; width: 100%; max-width: 450px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); transform: translateY(30px) scale(0.95); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); max-height: 90vh; overflow-y: auto; }
+        .modal-content { background: var(--bg-base); border: 1px solid var(--panel-border); padding: 30px; border-radius: 20px; width: 100%; max-width: 500px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); transform: translateY(30px) scale(0.95); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); max-height: 90vh; overflow-y: auto; }
         .modal.show .modal-content { transform: translateY(0) scale(1); }
+
+        .detail-item { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 4px solid var(--color-free); transition: 0.2s; word-wrap: break-word; }
+        .detail-item.booked { border-left-color: var(--color-booked); }
+        .detail-item.pending { border-left-color: var(--color-pending); }
+        .detail-meta { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; flex-wrap: wrap; gap: 5px; }
 
         .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; max-width: 90vw; }
         .toast { background: rgba(18, 26, 43, 0.95); backdrop-filter: blur(10px); border-left: 4px solid var(--color-free); padding: 15px 20px; border-radius: 10px; color: #fff; display: flex; align-items: center; gap: 12px; font-weight: 500; box-shadow: 0 10px 25px rgba(0,0,0,0.5); transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
@@ -136,50 +155,82 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
 
-        @media (max-width: 1024px) {
-            .dashboard { grid-template-columns: 1fr; } 
+        /* ================= IPAD / TABLET (< 1080px) ================= */
+        @media (max-width: 1080px) {
+            .app-container { flex-direction: column; min-height: auto; gap: 15px; }
+            
+            /* เปลี่ยน Sidebar กลับไปเป็น Header ด้านบนแนวนอน */
+            .sidebar { width: 100%; flex-direction: row; justify-content: space-between; align-items: center; flex-wrap: wrap; padding: 20px; }
+            .sidebar .title-box { flex-direction: row; width: auto; }
+            .sidebar .subtitle { margin-top: 0; padding: 0; background: transparent; border: none; }
+            
+            /* จัดเรียงเวลาใหม่แนวนอน */
+            .time-container { margin: 0; order: 2; width: 100%; text-align: left; padding-top: 10px; display: flex; align-items: flex-end; gap: 15px; }
+            #dateDisplay { margin-bottom: 2px; font-size: 14px; }
+            #clock { font-size: 26px; } 
+            
+            .sidebar-actions { padding-top: 0; border-top: none; flex-direction: row; width: 100%; justify-content: flex-end; order: 3; margin-top: 15px; }
+            .sidebar-actions .btn { width: auto; padding: 12px 20px; }
+
+            .calendar-grid { gap: 8px; }
+            .day-card { min-height: 100px; padding: 10px; }
+            .day-num { font-size: 18px; }
+            .slot-badge { font-size: 12px; padding: 4px 6px; }
         }
-        
+
+        /* ================= MOBILE (< 768px) ================= */
         @media (max-width: 768px) {
-            body { padding: 10px 10px 40px 10px; }
+            body { padding: 10px 10px 30px 10px; }
             .glass-panel { padding: 15px; border-radius: 16px; }
             
-            .header { flex-direction: column; align-items: stretch; gap: 10px; margin-bottom: 15px; }
-            .title-box { justify-content: flex-start; margin-bottom: 5px; }
+            /* Sidebar (Header on Mobile) */
+            .sidebar { flex-direction: column; align-items: stretch; gap: 15px; padding: 15px; }
+            .sidebar .title-box { flex-direction: column; text-align: center; align-items: center;}
+            .sidebar .title-header-row { flex-direction: column; }
+            .sidebar .subtitle { display: flex; flex-direction: column; gap: 4px; padding: 10px; font-size: 12px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); }
             
-            #clock { display: none; }
-            .title { font-size: 20px; }
-            .subtitle { font-size: 12px; }
-            .sys-icon { width: 35px; height: 35px; }
+            .time-container { display: none; } /* ซ่อนเวลาบนมือถือเพื่อประหยัดที่ */
             
-            .header-actions { display: flex; flex-wrap: wrap; width: 100%; gap: 10px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.08); justify-content: space-between; }
-            .header-actions .btn { flex: 1 1 45%; max-width: 100%; margin: 0; }
-            .header-actions .btn-book { flex: 1 1 100%; order: -1; padding: 15px; font-size: 16px; border-radius: 12px; }
+            .sidebar-actions { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 15px; margin-top: 0; gap: 10px;}
+            .sidebar-actions .btn { width: 100%; font-size: 14px; padding: 12px 10px; margin: 0; }
+            .sidebar-actions .btn-book { grid-column: span 2; order: -1; padding: 15px; font-size: 16px; border-radius: 12px; } /* ปุ่มจองห้องเต็มจอ */
             
+            /* Calendar Nav */
             .calendar-nav { flex-direction: column; align-items: stretch; gap: 12px; margin-bottom: 15px; }
             .month-control { justify-content: space-between; width: 100%; background: rgba(0,0,0,0.2); padding: 5px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
+            .month-dropdown { flex: 1; margin: 0 10px; font-size: 15px; min-width: unset; padding: 6px 10px; }
+            .btn-icon-only { background: rgba(255,255,255,0.05); border: none; padding: 6px 14px;}
             
-            /* Responsive Dropdown */
-            .month-dropdown { flex: 1; margin: 0 10px; font-size: 15px; min-width: unset; }
-            
-            .btn-icon-only { background: rgba(255,255,255,0.05); border: none; }
-            
-            .status-legend { width: 100%; justify-content: space-between; padding: 12px; box-sizing: border-box; }
+            .status-legend { width: 100%; justify-content: center; padding: 12px; box-sizing: border-box; }
             .legend-item { font-size: 11px; }
 
-            .calendar-grid { gap: 6px; }
-            .day-card { padding: 6px; min-height: 85px; border-radius: 8px; border-width: 1px; }
+            /* Calendar Grid for Mobile */
+            .calendar-grid { gap: 4px; }
+            .day-header { font-size: 12px; padding: 8px 0; }
+            .day-card { padding: 4px; min-height: 80px; border-radius: 8px; border-width: 1px; }
             .day-num { font-size: 14px; text-align: center; margin-bottom: 4px; }
             
-            .slots-container { gap: 5px; margin-top: auto; }
+            .slots-container { gap: 4px; margin-top: auto; }
             
-            .slot-badge { font-size: 11px; font-weight: 600; padding: 4px 2px; text-align: center; border-radius: 5px; border-left: none; border: 1px solid transparent; letter-spacing: 0.5px; background-image: none !important; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+            /* Mobile Slot Badges */
+            .slot-badge { 
+                font-size: 10px; font-weight: 600; padding: 3px 2px; text-align: center; 
+                border-radius: 4px; border-left: none; border: 1px solid transparent; 
+                letter-spacing: 0px; background-image: none !important; box-shadow: 0 1px 3px rgba(0,0,0,0.3); 
+            }
             .slot-free { background-color: rgba(16, 185, 129, 0.25) !important; border-color: rgba(16, 185, 129, 0.8) !important; color: #a7f3d0 !important; text-shadow: 0 0 6px rgba(16, 185, 129, 0.8); }
             .slot-booked { background-color: rgba(239, 68, 68, 0.3) !important; border-color: rgba(239, 68, 68, 0.8) !important; color: #fecaca !important; text-shadow: 0 0 6px rgba(239, 68, 68, 0.8); }
             .slot-pending { background-color: rgba(245, 158, 11, 0.3) !important; border-color: rgba(245, 158, 11, 0.8) !important; color: #fde68a !important; text-shadow: 0 0 6px rgba(245, 158, 11, 0.8); }
             
+            .holiday-text { font-size: 9px; padding: 2px; border-radius: 4px;}
+            .weekend-text { font-size: 9px; }
+
+            /* Bottom Sheet Modal for Mobile */
             .modal { align-items: flex-end; padding: 0; }
-            .modal-content { border-radius: 24px 24px 0 0; width: 100%; max-width: 100%; margin: 0; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); padding: 25px 20px 40px 20px; border-bottom: none; }
+            .modal-content { 
+                border-radius: 24px 24px 0 0; width: 100%; max-width: 100%; margin: 0; 
+                transform: translateY(100%); padding: 25px 20px 40px 20px; border-bottom: none; 
+            }
             .modal.show .modal-content { transform: translateY(0); }
             
             .detail-meta { flex-direction: column; }
@@ -192,40 +243,46 @@
 
 <div id="toastContainer" class="toast-container"></div>
 
-<div class="header glass-panel">
-    <div class="title-box">
-        <svg class="sys-icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-        <div>
-            <h1 class="title">NTL_LIBRARY_SYSTEM</h1>
-            <div class="subtitle">Mail : BSCS_GNR &nbsp;|&nbsp; Tel : 3262-3264 <br> STATUS: <span id="connStatus" style="color:var(--color-free)">ONLINE</span></div>
+<div class="app-container">
+    
+    <div class="sidebar glass-panel">
+        <div class="title-box">
+            <div class="title-header-row">
+                <svg class="sys-icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                <h1 class="title">NTL_LIBRARY SYSTEM</h1>
+            </div>
+            <div class="subtitle">
+                <div>📧 Mail : BSCS_GNR</div>
+                <div>📞 Tel : 3262-3264</div>
+                <div style="margin-top:5px; padding-top:5px; border-top: 1px solid rgba(255,255,255,0.1);">STATUS: <span id="connStatus" style="color:var(--color-free); font-weight: 500;">ONLINE</span></div>
+            </div>
+        </div>
+        
+        <div class="time-container">
+            <div id="dateDisplay">--</div>
+            <div id="clock">00:00:00</div>
+        </div>
+        
+        <div class="sidebar-actions">
+            <button class="btn btn-primary btn-book" onclick="openBooking()">
+                <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7v-5z"/></svg> จองห้อง
+            </button>
+
+            <button id="adminBtn" class="btn btn-outline" onclick="handleAdminClick()">
+                <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg> <span id="adminBtnText">ADMIN</span>
+            </button>
+
+            <button id="homeBtn" class="btn btn-outline" onclick="goToMainMenu()" style="display: none; border-color: #10b981; color: #10b981;">
+                <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg> หน้าหลัก
+            </button>
         </div>
     </div>
-    
-    <div class="header-actions">
-        <div id="clock">00:00:00</div>
-        
-        <button id="homeBtn" class="btn btn-outline" onclick="goToMainMenu()" style="display: none; border-color: #10b981; color: #10b981;">
-            <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg> หน้าหลัก
-        </button>
-        
-        <button id="adminBtn" class="btn btn-outline" onclick="handleAdminClick()">
-            <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg> <span id="adminBtnText">ADMIN</span>
-        </button>
-        
-        <button class="btn btn-primary btn-book" onclick="openBooking()">
-            <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7v-5z"/></svg> จองห้อง
-        </button>
-    </div>
-</div>
 
-<div class="dashboard">
-    <div class="glass-panel">
+    <div class="main-content glass-panel">
         <div class="calendar-nav">
             <div class="month-control">
                 <button id="prevMonthBtn" class="btn btn-outline btn-icon-only" onclick="changeMonth(-1)" style="visibility: hidden;">&lt;</button>
-                
                 <select id="monthSelect" class="month-dropdown" onchange="selectMonthFromDropdown()"></select>
-
                 <button id="nextMonthBtn" class="btn btn-outline btn-icon-only" onclick="changeMonth(1)">&gt;</button>
             </div>
             
@@ -239,14 +296,16 @@
         <div class="calendar-grid" id="calendarGrid"></div>
     </div>
 
-    <div class="glass-panel" id="detailSection">
-        <h2 class="section-title" style="margin-bottom: 5px;">USAGE TREND (YEARLY)</h2>
-        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">สรุปยอดจำนวนการจองตลอดทั้งปี (แบ่งตามเดือน)</div>
-        <div class="chart-container"><canvas id="trendChart"></canvas></div>
-        <div id="selectedDateLabel" style="color: var(--primary); margin-bottom: 15px; font-size: 15px; font-weight: 500;">รายละเอียดการจอง (เลือกวันที่)</div>
-        <div id="detailsContainer" style="max-height: 400px; overflow-y: auto; padding-right: 5px; scroll-margin-top: 20px;">
-            <div style="text-align:center; color:var(--text-muted); padding: 30px;">คลิกที่วันที่ในปฏิทินเพื่อดูข้อมูล</div>
+</div> <div id="dayDetailsModal" class="modal">
+    <div class="modal-content" style="max-width: 550px; width: 95%;">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--panel-border); padding-bottom:15px; margin-bottom: 15px;">
+            <h3 id="dayModalTitle" style="color: var(--primary); margin: 0; display:flex; align-items:center; gap:8px;">
+                <svg viewBox="0 0 24 24" style="width:20px; fill:currentColor;"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg> 
+                รายละเอียด
+            </h3>
+            <button onclick="closeModal('dayDetailsModal')" style="background:transparent; border:none; color:var(--text-muted); font-size:28px; cursor:pointer; padding:0 5px; line-height:1;">&times;</button>
         </div>
+        <div id="modalDetailsContainer" style="max-height: 60vh; overflow-y: auto; padding-right: 5px;"></div>
     </div>
 </div>
 
@@ -308,14 +367,14 @@
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbygm0JNns8iUFXv73V85OBRk-eji_zvtU61deXV7tWTTFSC1aAv-tln1bQm96gmx-Nm/exec"; 
     
-    // วันหยุด (เพิ่มของปีหน้าเผื่อไว้ได้เลย)
+    // วันหยุดนักขัตฤกษ์
     const thaiHolidays = {
         "2026-01-01": "วันขึ้นปีใหม่", "2026-03-03": "วันมาฆบูชา", "2026-04-06": "วันจักรี",
         "2026-04-13": "วันสงกรานต์", "2026-04-14": "วันสงกรานต์", "2026-04-15": "วันสงกรานต์",
         "2026-05-01": "วันแรงงาน", "2026-05-04": "วันฉัตรมงคล", "2026-06-03": "วันเฉลิมฯ พระราชินี",
         "2026-07-28": "วันเฉลิมฯ ร.10", "2026-08-12": "วันแม่แห่งชาติ", "2026-10-13": "วันนวมินทรมหาราช",
         "2026-10-23": "วันปิยมหาราช", "2026-12-05": "วันพ่อแห่งชาติ", "2026-12-10": "วันรัฐธรรมนูญ", "2026-12-31": "วันสิ้นปี",
-        "2027-01-01": "วันขึ้นปีใหม่" // เผื่อข้ามไปปีหน้า
+        "2027-01-01": "วันขึ้นปีใหม่"
     };
 
     function goToMainMenu() {
@@ -325,15 +384,25 @@
 
     let bookings = [];
     let isAdmin = false;
-    let myChart = null;
     let currentMonthOffset = 0; 
-    const MAX_MONTH_OFFSET = 11; // 💡 กำหนดให้ดูและจองล่วงหน้าได้ 12 เดือน (รวมเดือนปัจจุบัน)
+    const MAX_MONTH_OFFSET = 11; 
 
     const adminAccounts = { 'admin1': '1111', 'admin2': '2222', 'admin3': '3333' };
 
+    // ✨ อัปเดตเวลาและวันที่แบบ Real-time
     setInterval(() => {
+        const now = new Date();
         const clock = document.getElementById('clock');
-        if(clock) clock.innerText = new Date().toLocaleTimeString('en-GB');
+        const dateDisplay = document.getElementById('dateDisplay');
+        
+        if(clock) clock.innerText = now.toLocaleTimeString('en-GB');
+        if(dateDisplay) {
+            dateDisplay.innerText = now.toLocaleDateString('th-TH', { 
+                day: 'numeric', 
+                month: 'short', 
+                year: 'numeric' 
+            }); // จะแสดงผลแบบ "1 เม.ย. 2569"
+        }
     }, 1000);
 
     const dayInfo = [
@@ -373,13 +442,11 @@
         return { am, pm };
     }
 
-    // ✨ สร้างตัวเลือกให้ Dropdown เมื่อเริ่มโปรแกรม
     function initMonthDropdown() {
         const select = document.getElementById('monthSelect');
         select.innerHTML = '';
         const realNow = new Date();
         
-        // สร้างตัวเลือกเดือนล่วงหน้า (0 = เดือนนี้, 1 = เดือนหน้า ... ไปเรื่อยๆ 12 เดือน)
         for(let i = 0; i <= MAX_MONTH_OFFSET; i++) {
             let d = new Date(realNow.getFullYear(), realNow.getMonth() + i, 1);
             let opt = document.createElement('option');
@@ -389,10 +456,8 @@
         }
     }
 
-    // ✨ เมื่อผู้ใช้เปลี่ยนค่าใน Dropdown
     function selectMonthFromDropdown() {
         currentMonthOffset = parseInt(document.getElementById('monthSelect').value);
-        resetDetailContainer();
         renderCalendar();
     }
 
@@ -401,14 +466,8 @@
         if (currentMonthOffset < 0) currentMonthOffset = 0; 
         if (currentMonthOffset > MAX_MONTH_OFFSET) currentMonthOffset = MAX_MONTH_OFFSET; 
         
-        document.getElementById('monthSelect').value = currentMonthOffset; // อัปเดต Dropdown ให้ตรงกัน
-        resetDetailContainer();
+        document.getElementById('monthSelect').value = currentMonthOffset; 
         renderCalendar();
-    }
-    
-    function resetDetailContainer() {
-        document.getElementById('detailsContainer').innerHTML = `<div style="text-align:center; color:var(--text-muted); padding: 30px;">คลิกที่วันที่ในปฏิทินเพื่อดูข้อมูล</div>`;
-        document.getElementById('selectedDateLabel').innerText = `รายละเอียดการจอง (เลือกวันที่)`;
     }
 
     function renderCalendar() {
@@ -423,7 +482,6 @@
         const month = displayDate.getMonth();
         const todayStr = `${realNow.getFullYear()}-${String(realNow.getMonth()+1).padStart(2, '0')}-${String(realNow.getDate()).padStart(2, '0')}`;
         
-        // ซ่อน-โชว์ปุ่มลูกศร
         const prevBtn = document.getElementById('prevMonthBtn');
         const nextBtn = document.getElementById('nextMonthBtn');
         prevBtn.style.visibility = (currentMonthOffset > 0) ? 'visible' : 'hidden';
@@ -467,38 +525,6 @@
             }
             cal.appendChild(card);
         }
-
-        renderYearlyChart(displayDate);
-    }
-
-    function renderYearlyChart(displayDate) {
-        const ctx = document.getElementById('trendChart').getContext('2d');
-        const targetYear = displayDate.getFullYear();
-        
-        const monthLabels = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
-        let yearlyData = Array(12).fill(0);
-        
-        bookings.forEach(b => {
-            if (b.Status === 'rejected' || b.Status === 'cancelled') return;
-            if (!b.Date) return;
-            
-            const bYear = parseInt(b.Date.split('-')[0]);
-            const bMonth = parseInt(b.Date.split('-')[1]) - 1; 
-            
-            if (bYear === targetYear) yearlyData[bMonth]++;
-        });
-
-        if (myChart) myChart.destroy();
-
-        let gradient = ctx.createLinearGradient(0, 0, 0, 200);
-        gradient.addColorStop(0, 'rgba(56, 189, 248, 0.9)');
-        gradient.addColorStop(1, 'rgba(56, 189, 248, 0.2)');
-
-        myChart = new Chart(ctx, {
-            type: 'bar', 
-            data: { labels: monthLabels, datasets: [{ label: `จำนวนคิวจองปี ${targetYear}`, data: yearlyData, backgroundColor: gradient, borderRadius: 6, borderWidth: 0, barPercentage: 0.6 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false, color: 'rgba(255,255,255,0.05)' } }, y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { stepSize: 1, precision: 0 } } } }
-        });
     }
 
     async function fetchData() {
@@ -515,7 +541,9 @@
                  return;
             }
 
-            initMonthDropdown(); // สร้างตัวเลือก Dropdown ครั้งแรก
+            if(document.getElementById('monthSelect').options.length === 0) {
+                initMonthDropdown();
+            }
             renderCalendar();
             
             if(isAdmin && document.getElementById('adminDashModal').classList.contains('show')) {
@@ -532,13 +560,17 @@
     }
 
     function showDetails(dateStr, rawDayData, dayNum) {
-        const container = document.getElementById('detailsContainer');
-        document.getElementById('selectedDateLabel').innerText = `ข้อมูลของวันที่: ${dayNum}`;
+        const container = document.getElementById('modalDetailsContainer');
+        
+        const dateObj = new Date(dateStr);
+        const thaiDate = dateObj.toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric' });
+        
+        document.getElementById('dayModalTitle').innerHTML = `<svg viewBox="0 0 24 24" style="width:22px; fill:currentColor;"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg> ${thaiDate}`;
         
         const displayData = isAdmin ? rawDayData : rawDayData.filter(b => b.Status !== 'rejected' && b.Status !== 'cancelled');
 
         if (displayData.length === 0) {
-            container.innerHTML = `<div style="text-align:center; padding: 30px;"><div style="color:var(--text-muted); margin-bottom:15px;">ไม่มีคิวการใช้งานในวันนี้</div><button class="btn btn-primary" onclick="openBookingWithDate('${dateStr}')">จองคิวแรกของวัน</button></div>`;
+            container.innerHTML = `<div style="text-align:center; padding: 40px 20px;"><div style="color:var(--text-muted); margin-bottom:15px; font-size:15px;">ไม่มีคิวการใช้งานในวันนี้</div><button class="btn btn-primary" onclick="openBookingWithDate('${dateStr}')" style="margin: 0 auto; width: auto;"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg> สร้างคิวจองใหม่</button></div>`;
         } else {
             container.innerHTML = '';
             displayData.sort((a,b) => (a['Start Time']||"").localeCompare(b['Start Time']||"")).forEach(b => {
@@ -574,11 +606,17 @@
                     </div>
                 `;
             });
+            
+            container.innerHTML += `<div style="text-align:center; padding-top: 10px;"><button class="btn btn-outline" style="width:100%; border-style: dashed;" onclick="openBookingWithDate('${dateStr}')">+ จองคิวเวลาอื่นเพิ่มเติม</button></div>`;
         }
         
-        if(window.innerWidth <= 768) {
-            document.getElementById('detailSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        document.getElementById('dayDetailsModal').classList.add('show');
+    }
+
+    function openBookingWithDate(d) { 
+        closeModal('dayDetailsModal'); 
+        document.getElementById('formDate').value = d; 
+        openBooking(); 
     }
 
     async function submitBooking() {
@@ -643,7 +681,7 @@
         document.getElementById('adminBtn').style.borderColor = "rgba(255,255,255,0.2)"; document.getElementById('adminBtn').style.color = "var(--text-main)"; document.getElementById('adminBtnText').innerText = "ADMIN";
         
         const homeBtn = document.getElementById('homeBtn'); if(homeBtn) homeBtn.style.display = "none";
-        renderCalendar(); resetDetailContainer();
+        renderCalendar();
     }
 
     function renderAdminDashboard() {
@@ -678,6 +716,8 @@
         let msg = status === 'approved' ? 'อนุมัติ' : status === 'rejected' ? 'ปฏิเสธ (Reject)' : 'ยกเลิก (Cancel)';
         if(!confirm(`ยืนยันที่จะ ${msg} รายการนี้?`)) return;
         
+        closeModal('dayDetailsModal'); 
+        
         showToast(`กำลัง ${msg}...`, "warning");
         try {
             await fetch(API_URL, { method: 'POST', headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: 'update', id: id, status: status }) });
@@ -686,7 +726,6 @@
     }
 
     function openBooking() { document.getElementById('bookingModal').classList.add('show'); }
-    function openBookingWithDate(d) { document.getElementById('formDate').value = d; openBooking(); }
     
     function closeModal(id) { document.getElementById(id).classList.remove('show'); }
     window.onclick = function(event) { if (event.target.classList.contains('modal')) event.target.classList.remove('show'); }
