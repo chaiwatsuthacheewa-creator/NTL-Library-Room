@@ -6,243 +6,205 @@
     <title>NTL Library Pro System</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
+        /* ================= ระบบสี THEME ================= */
         :root {
-            --bg-base: #0a0f18;
-            --panel-bg: rgba(18, 26, 43, 0.65);
-            --panel-border: rgba(56, 189, 248, 0.15);
-            --primary: #38bdf8;
-            --primary-glow: rgba(56, 189, 248, 0.4);
+            /* โทน 1: กลางคืน (Oceanside Serenity) */
+            --bg-base: #0f172a;
+            --panel-bg: rgba(30, 41, 59, 0.7);
+            --panel-border: rgba(45, 212, 191, 0.2);
+            --primary: #2dd4bf;
+            --primary-text: #000000;
+            --primary-glow: rgba(45, 212, 191, 0.4);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
+            
+            --color-free: #34d399;
+            --color-booked: #fb7185;
+            --color-pending: #fbbf24;
+
+            --sub-bg: rgba(0,0,0,0.25);
+            --sub-border: rgba(255,255,255,0.08);
+            --card-bg: rgba(255,255,255,0.02);
+            --day-num: #e2e8f0;
+            --input-bg: rgba(0,0,0,0.4);
+            --modal-overlay: rgba(0,0,0,0.8);
+            --bg-gradient: radial-gradient(circle at 15% 50%, rgba(45, 212, 191, 0.05), transparent 25%), radial-gradient(circle at 85% 30%, rgba(52, 211, 153, 0.03), transparent 25%);
+            --shadow-base: rgba(0,0,0,0.3);
+        }
+
+        [data-theme="light"] {
+            /* โทน 2: กลางวัน (Pastel Tech) */
+            --bg-base: #f8fafc;
+            --panel-bg: rgba(255, 255, 255, 0.85);
+            --panel-border: rgba(167, 139, 250, 0.3);
+            --primary: #8b5cf6;
+            --primary-text: #ffffff;
+            --primary-glow: rgba(139, 92, 246, 0.3);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
             
             --color-free: #10b981;
             --color-booked: #ef4444;
             --color-pending: #f59e0b;
+
+            --sub-bg: rgba(0,0,0,0.03);
+            --sub-border: rgba(0,0,0,0.08);
+            --card-bg: rgba(0,0,0,0.02);
+            --day-num: #1e293b;
+            --input-bg: rgba(255,255,255,0.7);
+            --modal-overlay: rgba(255,255,255,0.4);
+            --bg-gradient: radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.05), transparent 25%), radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.03), transparent 25%);
+            --shadow-base: rgba(139, 92, 246, 0.15);
         }
+
+        /* ================================================= */
 
         * { box-sizing: border-box; }
 
-        /* ================= DESKTOP BASE (ล็อกหน้าจอเต็ม 100%) ================= */
         html, body {
             margin: 0; padding: 0; font-family: 'Kanit', sans-serif;
             background-color: var(--bg-base); color: var(--text-main);
-            background-image: 
-                radial-gradient(circle at 15% 50%, rgba(56, 189, 248, 0.05), transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.03), transparent 25%);
-            height: 100dvh; 
-            overflow: hidden; /* ซ่อนแถบ Scroll บนคอมพิวเตอร์ */
+            background-image: var(--bg-gradient);
+            height: 100dvh; overflow: hidden; transition: background-color 0.4s ease;
         }
 
-        .glass-panel { background: var(--panel-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--panel-border); border-radius: 16px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); padding: 20px; }
+        .glass-panel { background: var(--panel-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--panel-border); border-radius: 16px; box-shadow: 0 8px 32px var(--shadow-base); padding: 20px; transition: 0.4s; }
         
-        .app-container {
-            display: flex; gap: 20px;
-            max-width: 1800px; 
-            margin: 0 auto;
-            height: 100dvh;
-            padding: 20px;
-            align-items: stretch;
-        }
+        .app-container { display: flex; gap: 20px; max-width: 1800px; margin: 0 auto; height: 100dvh; padding: 20px; align-items: stretch; }
 
-        /* 👈 แถบเมนูด้านซ้าย (Sidebar) */
         .sidebar { width: 280px; flex-shrink: 0; display: flex; flex-direction: column; }
         .sidebar .title-box { display: flex; align-items: flex-start; gap: 15px; flex-direction: column; }
         .sidebar .title-header-row { display: flex; align-items: center; gap: 15px; width: 100%;}
-        .sys-icon { width: 45px; height: 45px; fill: var(--primary); filter: drop-shadow(0 0 8px var(--primary-glow)); flex-shrink: 0; }
-        .title { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: 1px; color: #fff; line-height: 1.2; word-break: break-word;}
-        .subtitle { font-size: 13px; color: var(--text-muted); font-weight: 400; letter-spacing: 0.5px; margin-top: 15px; line-height: 1.6; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); width: 100%;}
+        .sys-icon { width: 45px; height: 45px; fill: var(--primary); filter: drop-shadow(0 0 8px var(--primary-glow)); flex-shrink: 0; transition: 0.3s;}
+        .title { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: 1px; color: var(--text-main); line-height: 1.2; word-break: break-word; transition: 0.3s;}
+        .subtitle { font-size: 13px; color: var(--text-muted); font-weight: 400; letter-spacing: 0.5px; margin-top: 15px; line-height: 1.6; background: var(--sub-bg); padding: 15px; border-radius: 10px; border: 1px solid var(--sub-border); width: 100%; transition: 0.3s;}
         
         .time-container { text-align: center; margin: auto 0; padding: 20px 0;}
         #dateDisplay { font-size: 15px; color: var(--text-muted); font-weight: 400; letter-spacing: 0.5px; margin-bottom: 5px; }
-        #clock { font-size: 32px; color: var(--primary); font-weight: 300; margin: 0; font-variant-numeric: tabular-nums; letter-spacing: 2px; text-shadow: 0 0 15px var(--primary-glow); line-height: 1; }
+        #clock { font-size: 32px; color: var(--primary); font-weight: 300; margin: 0; font-variant-numeric: tabular-nums; letter-spacing: 2px; text-shadow: 0 0 15px var(--primary-glow); line-height: 1; transition: 0.3s;}
 
-        .sidebar-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 0; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); }
+        .sidebar-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 0; padding-top: 20px; border-top: 1px solid var(--sub-border); transition: 0.3s;}
 
-        /* 👉 พื้นที่หลักปฏิทินขวา (Main Content) */
         .main-content { flex-grow: 1; display: flex; flex-direction: column; min-width: 0; height: 100%; }
 
-        .calendar-nav { 
-            display: flex; justify-content: space-between; align-items: center; 
-            margin-bottom: 15px; flex-wrap: wrap; gap: 15px; 
-            background: rgba(0, 0, 0, 0.2); 
-            padding: 10px 20px; 
-            border-radius: 16px; 
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            flex-shrink: 0;
-        }
+        .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 15px; background: var(--sub-bg); padding: 10px 20px; border-radius: 16px; border: 1px solid var(--sub-border); flex-shrink: 0; transition: 0.3s;}
         
-        .month-control { 
-            display: flex; align-items: center; gap: 5px; 
-            background: rgba(10, 15, 24, 0.6); 
-            border: 1px solid rgba(56, 189, 248, 0.3); 
-            border-radius: 12px; padding: 4px; 
-        }
+        .month-control { display: flex; align-items: center; gap: 5px; background: var(--input-bg); border: 1px solid var(--primary-glow); border-radius: 12px; padding: 4px; transition: 0.3s;}
 
-        .btn-icon-only { 
-            background: transparent; color: var(--text-muted); 
-            border: none; padding: 6px 16px; border-radius: 8px; 
-            font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; 
-            display: flex; align-items: center; justify-content: center;
-        }
-        .btn-icon-only:hover { background: rgba(255,255,255,0.05); color: var(--primary); }
+        .btn-icon-only { background: transparent; color: var(--text-muted); border: none; padding: 6px 16px; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center;}
+        .btn-icon-only:hover { background: var(--sub-bg); color: var(--primary); }
 
-        .month-dropdown {
-            font-size: 18px; font-weight: 500; color: var(--primary); text-align: center;
-            background: transparent; border: none; font-family: 'Kanit', sans-serif;
-            cursor: pointer; outline: none; min-width: 180px; padding: 5px 10px;
-            -webkit-appearance: none; appearance: none;
-        }
-        .month-dropdown option { background: var(--bg-base); color: #fff; }
+        .month-dropdown { font-size: 18px; font-weight: 500; color: var(--primary); text-align: center; background: transparent; border: none; font-family: 'Kanit', sans-serif; cursor: pointer; outline: none; min-width: 180px; padding: 5px 10px; -webkit-appearance: none; appearance: none; transition: 0.3s;}
+        .month-dropdown option { background: var(--bg-base); color: var(--text-main); }
 
-        .status-legend {
-            display: flex; gap: 15px; align-items: center; flex-wrap: wrap;
-            padding: 8px 15px; background: rgba(10, 15, 24, 0.4); 
-            border: 1px solid rgba(255,255,255,0.03); border-radius: 10px;
-        }
-        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-muted); font-weight: 400; }
-        .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-        .dot-free { background: var(--color-free); box-shadow: 0 0 8px rgba(16, 185, 129, 0.6); }
-        .dot-pending { background: var(--color-pending); box-shadow: 0 0 8px rgba(245, 158, 11, 0.6); }
-        .dot-booked { background: var(--color-booked); box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
+        .status-legend { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; padding: 8px 15px; background: var(--sub-bg); border: 1px solid var(--sub-border); border-radius: 10px; transition: 0.3s;}
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-muted); font-weight: 400; transition: 0.3s;}
+        .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; transition: 0.3s;}
+        .dot-free { background: var(--color-free); box-shadow: 0 0 8px var(--color-free); }
+        .dot-pending { background: var(--color-pending); box-shadow: 0 0 8px var(--color-pending); }
+        .dot-booked { background: var(--color-booked); box-shadow: 0 0 8px var(--color-booked); }
 
-        /* 🔥 CALENDAR GRID */
-        .calendar-grid { 
-            display: grid; 
-            grid-template-columns: 0.5fr 1fr 1fr 1fr 1fr 1fr 0.5fr; /* อา(0.5) จ-ศ(1) ส(0.5) */
-            gap: 8px; 
-            flex-grow: 1; 
-            align-content: stretch; 
-            overflow: hidden;
-        }
+        .calendar-grid { display: grid; grid-template-columns: 0.5fr 1fr 1fr 1fr 1fr 1fr 0.5fr; gap: 8px; flex-grow: 1; align-content: stretch; overflow: hidden; }
         
         .day-header { text-align: center; font-size: 15px; font-weight: 600; padding: 8px 0; letter-spacing: 1px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
-        .day-card { 
-            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 10px; 
-            cursor: pointer; transition: all 0.2s; 
-            display: flex; flex-direction: column; position: relative; overflow: hidden; 
-            height: 100%; min-height: 0; 
-        }
+        .day-card { background: var(--card-bg); border: 1px solid var(--sub-border); border-radius: 12px; padding: 10px; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; position: relative; overflow: hidden; height: 100%; min-height: 0; }
         .day-card:active { transform: scale(0.98); } 
-        .day-card:hover { border-color: var(--primary); box-shadow: 0 5px 15px var(--primary-glow); background: rgba(56, 189, 248, 0.05); }
-        .day-card.is-today { background: rgba(56, 189, 248, 0.1); border: 1px solid var(--primary); box-shadow: inset 0 0 20px rgba(56, 189, 248, 0.2); }
+        .day-card:hover { border-color: var(--primary); box-shadow: 0 5px 15px var(--primary-glow); background: var(--primary-glow); }
+        .day-card.is-today { background: var(--primary-glow); border: 1px solid var(--primary); box-shadow: inset 0 0 20px var(--primary-glow); }
         .day-card.is-today .day-num { color: var(--primary); text-shadow: 0 0 10px var(--primary-glow); font-size: 22px;}
         
-        .day-disabled { background: rgba(255,255,255,0.01); border-color: rgba(255,255,255,0.02); opacity: 0.5; cursor: not-allowed; justify-content: flex-start; align-items: center; padding-top: 15px; }
-        .day-disabled:hover { border-color: rgba(255,255,255,0.02); box-shadow: none; transform: none; background: rgba(255,255,255,0.01); }
+        .day-disabled { background: var(--sub-bg); border-color: var(--sub-border); opacity: 0.6; cursor: not-allowed; justify-content: flex-start; align-items: center; padding-top: 15px; }
+        .day-disabled:hover { border-color: var(--sub-border); box-shadow: none; transform: none; background: var(--sub-bg); }
         .holiday-text { font-size: 12px; color: #fca5a5; text-align: center; line-height: 1.2; font-weight: 500; margin-top: 4px; background: rgba(239, 68, 68, 0.15); padding: 4px; border-radius: 6px; width: 100%; word-wrap: break-word;}
         .weekend-text { font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 8px; word-wrap: break-word; line-height: 1.3;}
         
-        .day-num { font-size: 18px; font-weight: 600; color: #e2e8f0; width: 100%; margin-bottom: 5px; line-height: 1;}
+        .day-num { font-size: 18px; font-weight: 600; color: var(--day-num); width: 100%; margin-bottom: 5px; line-height: 1; transition: 0.3s;}
         .day-disabled .day-num { text-align: center; margin-bottom: 0; }
         
         .slots-container { display: flex; flex-direction: column; gap: 5px; width: 100%; margin-top: auto; overflow-y: auto; scrollbar-width: none;}
         .slots-container::-webkit-scrollbar { display: none; }
-        .slot-badge { font-size: 12px; padding: 6px 8px; border-radius: 4px; text-align: left; font-weight: 600; border-left: 3px solid transparent; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: 0.5px;}
+        .slot-badge { font-size: 12px; padding: 6px 8px; border-radius: 4px; text-align: left; font-weight: 600; border-left: 3px solid transparent; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: 0.5px; transition: 0.3s;}
         
-        .slot-free { border-left-color: var(--color-free); color: rgba(255,255,255,0.6); background: linear-gradient(90deg, rgba(16, 185, 129, 0.2) 0%, transparent 60%); }
-        .slot-booked { border-left-color: var(--color-booked); color: #fff; background: linear-gradient(90deg, rgba(239, 68, 68, 0.5) 0%, transparent 80%); text-shadow: 0 0 4px rgba(0,0,0,0.8); }
-        .slot-pending { border-left-color: var(--color-pending); color: #fff; background: linear-gradient(90deg, rgba(245, 158, 11, 0.5) 0%, transparent 80%); text-shadow: 0 0 4px rgba(0,0,0,0.8); }
+        .slot-free { border-left-color: var(--color-free); color: var(--text-main); background: linear-gradient(90deg, rgba(16, 185, 129, 0.2) 0%, transparent 60%); }
+        .slot-booked { border-left-color: var(--color-booked); color: #fff; background: linear-gradient(90deg, rgba(239, 68, 68, 0.6) 0%, transparent 80%); text-shadow: 0 0 4px rgba(0,0,0,0.5); }
+        .slot-pending { border-left-color: var(--color-pending); color: #fff; background: linear-gradient(90deg, rgba(245, 158, 11, 0.6) 0%, transparent 80%); text-shadow: 0 0 4px rgba(0,0,0,0.5); }
 
         /* BUTTONS & INPUTS */
         .btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border-radius: 10px; border: none; font-family: 'Kanit'; font-weight: 500; cursor: pointer; transition: all 0.2s; font-size: 15px; flex-shrink: 0; outline: none; width: 100%; }
         .btn:active { transform: scale(0.95); }
         .btn svg { width: 18px; height: 18px; fill: currentColor; flex-shrink: 0; }
-        .btn-primary { background: var(--primary); color: #000; box-shadow: 0 0 15px rgba(56, 189, 248, 0.3); font-size: 16px; }
-        .btn-primary:hover { background: #7dd3fc; box-shadow: 0 0 20px rgba(56, 189, 248, 0.5); }
-        .btn-outline { background: transparent; color: var(--text-main); border: 1px solid rgba(255,255,255,0.2); }
-        .btn-outline:hover { background: rgba(255,255,255,0.05); }
+        .btn-primary { background: var(--primary); color: var(--primary-text); box-shadow: 0 0 15px var(--primary-glow); font-size: 16px; }
+        .btn-primary:hover { filter: brightness(1.1); box-shadow: 0 0 20px var(--primary-glow); }
+        .btn-outline { background: transparent; color: var(--text-main); border: 1px solid var(--sub-border); }
+        .btn-outline:hover { background: var(--sub-bg); }
 
-        input, select, textarea { width: 100%; padding: 12px 15px; margin: 6px 0 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.4); color: #fff; font-family: 'Kanit'; font-size: 14px; transition: 0.3s; outline: none; box-sizing: border-box; }
-        input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2); background: rgba(0,0,0,0.6); }
+        input, select, textarea { width: 100%; padding: 12px 15px; margin: 6px 0 12px; border-radius: 10px; border: 1px solid var(--sub-border); background: var(--input-bg); color: var(--text-main); font-family: 'Kanit'; font-size: 14px; transition: 0.3s; outline: none; box-sizing: border-box; }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary-glow); }
         textarea { resize: vertical; min-height: 80px; }
         
         /* MODALS */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 1000; opacity: 0; transition: opacity 0.3s; padding: 20px; }
+        .modal { position: fixed; inset: 0; background: var(--modal-overlay); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 1000; opacity: 0; transition: opacity 0.3s, background 0.3s; padding: 20px; }
         .modal.show { display: flex; opacity: 1; }
-        .modal-content { background: var(--bg-base); border: 1px solid var(--panel-border); padding: 25px; border-radius: 20px; width: 100%; max-width: 500px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); transform: translateY(30px) scale(0.95); transition: transform 0.3s; max-height: 90vh; overflow-y: auto; }
+        .modal-content { background: var(--bg-base); border: 1px solid var(--panel-border); padding: 25px; border-radius: 20px; width: 100%; max-width: 500px; box-shadow: 0 25px 50px var(--shadow-base); transform: translateY(30px) scale(0.95); transition: transform 0.3s, background 0.3s; max-height: 90vh; overflow-y: auto; }
         .modal.show .modal-content { transform: translateY(0) scale(1); }
 
-        .detail-item { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 12px; border-left: 4px solid var(--color-free); transition: 0.2s; word-wrap: break-word; }
+        .detail-item { background: var(--sub-bg); border: 1px solid var(--sub-border); padding: 15px; border-radius: 12px; margin-bottom: 12px; border-left: 4px solid var(--color-free); transition: 0.3s; word-wrap: break-word; }
         .detail-item.booked { border-left-color: var(--color-booked); }
         .detail-item.pending { border-left-color: var(--color-pending); }
         .detail-meta { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; flex-wrap: wrap; gap: 5px; }
 
         .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; max-width: 90vw; }
-        .toast { background: rgba(18, 26, 43, 0.95); backdrop-filter: blur(10px); border-left: 4px solid var(--color-free); padding: 15px 20px; border-radius: 10px; color: #fff; display: flex; align-items: center; gap: 12px; font-weight: 500; box-shadow: 0 10px 25px rgba(0,0,0,0.5); transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .toast { background: var(--panel-bg); backdrop-filter: blur(10px); border: 1px solid var(--panel-border); border-left: 4px solid var(--color-free); padding: 15px 20px; border-radius: 10px; color: var(--text-main); display: flex; align-items: center; gap: 12px; font-weight: 500; box-shadow: 0 10px 25px var(--shadow-base); transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s; }
         .toast.show { transform: translateX(0); }
 
-        /* ================= IPAD / TABLET (< 1080px) ปลดล็อก SCROLL ================= */
+        /* ================= IPAD / TABLET ปลดล็อก SCROLL ================= */
         @media (max-width: 1080px) {
-            html, body { 
-                height: auto; min-height: 100%; 
-                overflow-y: auto; /* ปลดล็อกให้เลื่อนขึ้นลงได้ */
-            }
+            html, body { height: auto; min-height: 100%; overflow-y: auto; }
             .app-container { flex-direction: column; gap: 15px; height: auto; min-height: 100vh; }
             .sidebar { width: 100%; flex-direction: row; justify-content: space-between; align-items: center; flex-wrap: wrap; padding: 15px; border-radius: 12px;}
             .sidebar .title-box { flex-direction: row; width: auto; }
             .sidebar .subtitle { margin-top: 0; padding: 0; background: transparent; border: none; }
-            
             .time-container { margin: 0; order: 2; padding: 0; width: 100%; text-align: left; display: flex; align-items: flex-end; gap: 15px; }
             #dateDisplay { margin-bottom: 2px; font-size: 14px; }
             #clock { font-size: 24px; } 
-            
             .sidebar-actions { padding-top: 0; border-top: none; flex-direction: row; width: 100%; justify-content: flex-end; order: 3; margin-top: 15px; }
             .sidebar-actions .btn { width: auto; padding: 10px 15px; }
-
             .main-content { padding: 15px; border-radius: 12px; height: auto; flex-grow: 1; }
             .calendar-nav { padding: 8px 15px; margin-bottom: 10px; }
-            
-            /* ลดขนาดลงบนไอแพดเล็กน้อย */
             .calendar-grid { grid-template-columns: 0.6fr 1fr 1fr 1fr 1fr 1fr 0.6fr; gap: 6px; height: auto;}
-            .day-card { 
-                padding: 8px 6px; 
-                min-height: 110px; /* บังคับความสูงไม่ให้แบนเกินไป */
-                height: auto;
-            }
+            .day-card { padding: 8px 6px; min-height: 110px; height: auto;}
             .day-num { font-size: 16px; }
             .slot-badge { font-size: 11px; padding: 4px 4px; }
         }
 
-        /* ================= MOBILE (< 768px) ปลดล็อก SCROLL ================= */
+        /* ================= MOBILE ปลดล็อก SCROLL ================= */
         @media (max-width: 768px) {
             .app-container { padding: 10px; gap: 10px; }
             .glass-panel { padding: 12px; border-radius: 12px; }
-            
             .sidebar { flex-direction: column; align-items: stretch; gap: 10px; }
             .sidebar .title-box { flex-direction: column; text-align: center; align-items: center;}
             .sidebar .title-header-row { flex-direction: column; gap: 5px; }
             .title { font-size: 20px; }
             .sys-icon { width: 35px; height: 35px; }
-            .sidebar .subtitle { display: flex; flex-direction: row; justify-content: space-between; gap: 4px; padding: 8px; font-size: 10px; background: rgba(0,0,0,0.2); flex-wrap: wrap;}
-            
+            .sidebar .subtitle { display: flex; flex-direction: row; justify-content: space-between; gap: 4px; padding: 8px; font-size: 10px; background: var(--sub-bg); flex-wrap: wrap;}
             .time-container { display: none; } 
-            
-            .sidebar-actions { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 10px; margin-top: 0; gap: 8px;}
+            .sidebar-actions { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--sub-border); padding-top: 10px; margin-top: 0; gap: 8px;}
             .sidebar-actions .btn { font-size: 13px; padding: 10px; }
             .sidebar-actions .btn-book { grid-column: span 2; order: -1; padding: 12px; font-size: 15px; border-radius: 10px; } 
-            
             .calendar-nav { flex-direction: column; align-items: stretch; padding: 10px; gap: 8px; margin-bottom: 8px; border-radius: 10px;}
             .month-control { justify-content: space-between; width: 100%; padding: 4px; }
             .month-dropdown { flex: 1; font-size: 15px; padding: 4px; }
             .btn-icon-only { padding: 6px 12px; }
             .status-legend { width: 100%; justify-content: center; padding: 8px; gap: 10px;}
             .legend-item { font-size: 10px; }
-
-            /* ปรับอัตราส่วนบนมือถือ */
             .calendar-grid { grid-template-columns: 0.7fr 1fr 1fr 1fr 1fr 1fr 0.7fr; gap: 4px; }
             .day-header { font-size: 11px; padding: 4px 0; border-radius: 4px; }
-            .day-card { 
-                padding: 4px; border-radius: 6px; border-width: 1px; 
-                min-height: 95px; /* บังคับความสูงช่องในมือถือ ให้สไลด์จอเอา */
-                height: auto;
-            }
+            .day-card { padding: 4px; border-radius: 6px; border-width: 1px; min-height: 95px; height: auto;}
             .day-num { font-size: 13px; margin-bottom: 2px; text-align: center;}
-            
             .slots-container { gap: 2px; }
             .slot-badge { font-size: 9px; padding: 2px; text-align: center; border-radius: 4px; border-left: none; box-shadow: 0 1px 2px rgba(0,0,0,0.3); line-height: 1.1; }
             .holiday-text { font-size: 8px; padding: 2px; border-radius: 4px; line-height: 1.1; margin-top: 2px;}
             .weekend-text { font-size: 8px; margin-top: 2px;}
-
             .modal { align-items: flex-end; padding: 0; }
             .modal-content { border-radius: 20px 20px 0 0; transform: translateY(100%); padding: 20px 15px 30px 15px; }
         }
@@ -276,11 +238,17 @@
             <button class="btn btn-primary btn-book" onclick="openBooking()">
                 <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7v-5z"/></svg> จองห้อง
             </button>
+            
+            <button id="themeToggleBtn" class="btn btn-outline" onclick="toggleTheme()" style="color: var(--text-muted);">
+                <svg id="themeIcon" viewBox="0 0 24 24"><path id="themeIconPath" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg> 
+                <span id="themeText">โหมดสว่าง</span>
+            </button>
+
             <button id="adminBtn" class="btn btn-outline" onclick="handleAdminClick()">
                 <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg> <span id="adminBtnText">ADMIN</span>
             </button>
             
-            <button id="homeBtn" class="btn btn-outline" onclick="goToMainMenu()" style="display: none; border-color: #10b981; color: #10b981;">
+            <button id="homeBtn" class="btn btn-outline" onclick="goToMainMenu()" style="display: none; border-color: var(--color-free); color: var(--color-free);">
                 <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg> หน้าหลัก
             </button>
         </div>
@@ -319,7 +287,7 @@
 
 <div id="bookingModal" class="modal">
     <div class="modal-content">
-        <h3 style="color: #fff; margin-top: 0; display:flex; align-items:center; gap:8px;">แบบฟอร์มจองห้อง</h3>
+        <h3 style="color: var(--text-main); margin-top: 0; display:flex; align-items:center; gap:8px;">แบบฟอร์มจองห้อง</h3>
         <input type="date" id="formDate">
         <select id="timeSlot">
             <option value="morning">ช่วงเช้า (08.00 - 12.00 น.)</option>
@@ -339,7 +307,7 @@
 
 <div id="loginModal" class="modal">
     <div class="modal-content" style="max-width: 320px;">
-        <h3 style="color: #fff; margin-top: 0; border-bottom: 1px solid var(--panel-border); padding-bottom:15px;">🔐 ADMIN LOGIN</h3>
+        <h3 style="color: var(--text-main); margin-top: 0; border-bottom: 1px solid var(--panel-border); padding-bottom:15px;">🔐 ADMIN LOGIN</h3>
         <input type="text" id="loginUser" placeholder="Username">
         <input type="password" id="loginPass" placeholder="Password">
         <div style="display: flex; gap: 10px; margin-top: 10px;">
@@ -381,6 +349,37 @@
     const MAX_MONTH_OFFSET = 11; 
     const adminAccounts = { 'admin1': 'gnr3admin', 'admin2': 'gnr3admin', 'admin3': 'gnr3admin' };
 
+    // ✨ ระบบ Theme กลางวัน/กลางคืน
+    function initTheme() {
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeBtn(savedTheme);
+    }
+
+    function toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeBtn(newTheme);
+    }
+
+    function updateThemeBtn(theme) {
+        const iconPath = document.getElementById('themeIconPath');
+        const text = document.getElementById('themeText');
+        if(!iconPath || !text) return;
+        
+        if (theme === 'light') {
+            // โลโก้พระจันทร์ (เพื่อกดกลับไปโหมดกลางคืน)
+            iconPath.setAttribute('d', 'M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z');
+            text.innerText = 'โหมดกลางคืน';
+        } else {
+            // โลโก้พระอาทิตย์ (เพื่อกดไปโหมดสว่าง)
+            iconPath.setAttribute('d', 'M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z');
+            text.innerText = 'โหมดสว่าง';
+        }
+    }
+
     // อัปเดตเวลาและวันที่แบบ Real-time
     setInterval(() => {
         const now = new Date();
@@ -402,7 +401,7 @@
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
         let icon = type === 'success' ? '<svg viewBox="0 0 24 24" style="fill:var(--color-free)"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>' : type === 'error' ? '<svg viewBox="0 0 24 24" style="fill:var(--color-booked)"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>' : '<svg viewBox="0 0 24 24" style="fill:var(--color-pending)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>';
-        toast.innerHTML = `${icon} <span>${msg}</span>`;
+        toast.innerHTML = `${icon} <span style="color:var(--text-main);">${msg}</span>`;
         container.appendChild(toast);
         setTimeout(() => toast.classList.add('show'), 10);
         setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 3500);
@@ -449,7 +448,7 @@
         const cal = document.getElementById('calendarGrid');
         cal.innerHTML = ''; 
         
-        dayInfo.forEach(d => { cal.innerHTML += `<div class="day-header" style="background: ${d.color}15; border: 1px solid ${d.color}40; color: ${d.color}; text-shadow: 0 0 8px ${d.color}80;">${d.name}</div>`; });
+        dayInfo.forEach(d => { cal.innerHTML += `<div class="day-header" style="background: ${d.color}15; border: 1px solid ${d.color}40; color: ${d.color};">${d.name}</div>`; });
 
         const realNow = new Date();
         const displayDate = new Date(realNow.getFullYear(), realNow.getMonth() + currentMonthOffset, 1);
@@ -465,7 +464,6 @@
         
         const totalCells = firstDayIndex + daysInMonth;
         const numRows = Math.ceil(totalCells / 7);
-        // ให้แถวบนสุด(หัวข้อวัน) ปรับขนาดตามเนื้อหา แถวที่เหลือให้ยืดเท่ากัน
         cal.style.gridTemplateRows = `auto repeat(${numRows}, 1fr)`; 
 
         for(let i = 0; i < firstDayIndex; i++) { cal.innerHTML += `<div></div>`; }
@@ -502,6 +500,7 @@
     }
 
     async function initSystem() {
+        initTheme(); // โหลดธีมก่อนเพื่อน
         initMonthDropdown();
         renderCalendar(); 
         await syncDataSilently(true); 
@@ -558,14 +557,14 @@
             displayData.sort((a,b) => (a['Start Time']||"").localeCompare(b['Start Time']||"")).forEach(b => {
                 const statusColor = (b.Status === 'approved') ? 'booked' : (b.Status === 'pending' ? 'pending' : 'free');
                 const statusText = b.Status === 'approved' ? '<span style="color:var(--color-booked);">อนุมัติแล้ว</span>' : b.Status === 'pending' ? '<span style="color:var(--color-pending);">รอตรวจสอบ</span>' : `<span style="color:var(--text-muted); text-decoration: line-through;">ยกเลิกแล้ว</span>`;
-                const detailHtml = (b.Detail && b.Detail !== "-" && b.Detail.trim() !== "") ? `<div style="color:#cbd5e1; font-size:13px; margin-bottom:8px; background: rgba(0,0,0,0.2); padding: 8px 10px; border-radius: 6px; border-left: 3px solid var(--primary);">📝 ${b.Detail}</div>` : '';
+                const detailHtml = (b.Detail && b.Detail !== "-" && b.Detail.trim() !== "") ? `<div style="color:var(--text-muted); font-size:13px; margin-bottom:8px; background: var(--bg-base); padding: 8px 10px; border-radius: 6px; border-left: 3px solid var(--primary);">📝 ${b.Detail}</div>` : '';
 
                 let adminBtns = '';
                 if (isAdmin) {
                     adminBtns = `<div class="admin-action-btns" style="margin-top: 15px; display:flex; gap:8px;"><button class="btn btn-outline" style="flex:1; color:var(--color-free); border-color:var(--color-free); padding:8px; font-size:12px;" onclick="updateStatus('${b.ID}', 'approved')">Approve</button><button class="btn btn-outline" style="flex:1; color:var(--color-pending); border-color:var(--color-pending); padding:8px; font-size:12px;" onclick="updateStatus('${b.ID}', 'rejected')">Reject</button><button class="btn btn-outline" style="flex:1; color:var(--color-booked); border-color:var(--color-booked); padding:8px; font-size:12px;" onclick="updateStatus('${b.ID}', 'cancelled')">Cancel</button></div>`;
                 }
 
-                container.innerHTML += `<div class="detail-item ${statusColor}" style="${(b.Status==='cancelled'||b.Status==='rejected')?'opacity:0.5':''}"><div class="detail-meta"><strong style="color:var(--primary); font-size:15px;">⏰ ${b['Start Time']} - ${b.StopTime}</strong><span style="font-size:14px">${statusText}</span></div><div style="color:#fff; font-size: 16px; font-weight:500; margin-bottom:6px;">${b.Subject}</div>${detailHtml}<div style="color:var(--text-muted); font-size:13px;">👤 ${b.User} | 📞 ${(b.Phone||"").replace(/'/g,'')}</div>${adminBtns}</div>`;
+                container.innerHTML += `<div class="detail-item ${statusColor}" style="${(b.Status==='cancelled'||b.Status==='rejected')?'opacity:0.5':''}"><div class="detail-meta"><strong style="color:var(--primary); font-size:15px;">⏰ ${b['Start Time']} - ${b.StopTime}</strong><span style="font-size:14px">${statusText}</span></div><div style="color:var(--text-main); font-size: 16px; font-weight:500; margin-bottom:6px;">${b.Subject}</div>${detailHtml}<div style="color:var(--text-muted); font-size:13px;">👤 ${b.User} | 📞 ${(b.Phone||"").replace(/'/g,'')}</div>${adminBtns}</div>`;
             });
             container.innerHTML += `<div style="text-align:center; padding-top: 10px;"><button class="btn btn-outline" style="width:100%; border-style: dashed;" onclick="openBookingWithDate('${dateStr}')">+ จองคิวเวลาอื่นเพิ่มเติม</button></div>`;
         }
@@ -615,7 +614,7 @@
             document.getElementById('adminBtn').style.color = "var(--primary)"; 
             document.getElementById('adminBtnText').innerText = "DASHBOARD";
             
-            // 🔓 เปิดปุ่มหน้าหลักเฉพาะตอนเป็น Admin
+            // เปิดปุ่มหน้าหลักเฉพาะตอนเป็น Admin
             document.getElementById('homeBtn').style.display = 'flex';
             
             handleAdminClick(); 
@@ -627,11 +626,11 @@
         isAdmin = false; 
         showToast('ออกจากระบบแล้ว', 'warning'); 
         closeModal('adminDashModal');
-        document.getElementById('adminBtn').style.borderColor = "rgba(255,255,255,0.2)"; 
+        document.getElementById('adminBtn').style.borderColor = "var(--sub-border)"; 
         document.getElementById('adminBtn').style.color = "var(--text-main)"; 
         document.getElementById('adminBtnText').innerText = "ADMIN";
         
-        // 🔒 ซ่อนปุ่มหน้าหลักเมื่อออกจากระบบ
+        // ซ่อนปุ่มหน้าหลักเมื่อออกจากระบบ
         document.getElementById('homeBtn').style.display = 'none';
         
         renderCalendar();
@@ -644,8 +643,8 @@
         container.innerHTML = '';
         pending.sort((a,b) => new Date(a.Date) - new Date(b.Date)).forEach(b => {
             const dateFmt = b.Date ? b.Date.split('T')[0] : '';
-            const detailHtml = (b.Detail && b.Detail !== "-" && b.Detail.trim() !== "") ? `<div style="color:#cbd5e1; font-size:13px; margin-bottom:8px; background: rgba(0,0,0,0.2); padding: 8px 10px; border-radius: 6px; border-left: 3px solid var(--primary);">📝 ${b.Detail}</div>` : '';
-            container.innerHTML += `<div class="detail-item pending" style="margin-bottom: 15px;"><div class="detail-meta"><strong style="color:var(--primary); font-size:15px;">📅 ${dateFmt} | ⏰ ${b['Start Time']} - ${b.StopTime}</strong></div><div style="color:#fff; font-size:16px; font-weight:500; margin-bottom:6px;">${b.Subject}</div>${detailHtml}<div style="color:var(--text-muted); font-size:13px;">👤 ผู้จอง: ${b.User} | 📞 ${(b.Phone||"").replace(/'/g,'')}</div><div class="admin-action-btns" style="margin-top: 15px; display:flex; gap:10px;"><button class="btn btn-outline" style="flex:1; color:var(--color-free); border-color:var(--color-free); padding:8px; font-size:13px;" onclick="updateStatus('${b.ID}', 'approved')">Approve</button><button class="btn btn-outline" style="flex:1; color:var(--color-pending); border-color:var(--color-pending); padding:8px; font-size:13px;" onclick="updateStatus('${b.ID}', 'rejected')">Reject</button><button class="btn btn-outline" style="flex:1; color:var(--color-booked); border-color:var(--color-booked); padding:8px; font-size:13px;" onclick="updateStatus('${b.ID}', 'cancelled')">Cancel</button></div></div>`;
+            const detailHtml = (b.Detail && b.Detail !== "-" && b.Detail.trim() !== "") ? `<div style="color:var(--text-muted); font-size:13px; margin-bottom:8px; background: var(--bg-base); padding: 8px 10px; border-radius: 6px; border-left: 3px solid var(--primary);">📝 ${b.Detail}</div>` : '';
+            container.innerHTML += `<div class="detail-item pending" style="margin-bottom: 15px;"><div class="detail-meta"><strong style="color:var(--primary); font-size:15px;">📅 ${dateFmt} | ⏰ ${b['Start Time']} - ${b.StopTime}</strong></div><div style="color:var(--text-main); font-size:16px; font-weight:500; margin-bottom:6px;">${b.Subject}</div>${detailHtml}<div style="color:var(--text-muted); font-size:13px;">👤 ผู้จอง: ${b.User} | 📞 ${(b.Phone||"").replace(/'/g,'')}</div><div class="admin-action-btns" style="margin-top: 15px; display:flex; gap:10px;"><button class="btn btn-outline" style="flex:1; color:var(--color-free); border-color:var(--color-free); padding:8px; font-size:13px;" onclick="updateStatus('${b.ID}', 'approved')">Approve</button><button class="btn btn-outline" style="flex:1; color:var(--color-pending); border-color:var(--color-pending); padding:8px; font-size:13px;" onclick="updateStatus('${b.ID}', 'rejected')">Reject</button><button class="btn btn-outline" style="flex:1; color:var(--color-booked); border-color:var(--color-booked); padding:8px; font-size:13px;" onclick="updateStatus('${b.ID}', 'cancelled')">Cancel</button></div></div>`;
         });
     }
 
