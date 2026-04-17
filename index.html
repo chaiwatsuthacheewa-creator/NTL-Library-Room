@@ -20,7 +20,7 @@
             
             --color-free: #10b981; /* เขียว */
             --color-booked: #f43f5e; /* แดงอมชมพู */
-            --color-pending: #f59e0b; /* ส้ม */
+            --color-rejected: #64748b; /* เทา (ไม่อนุมัติ) */
 
             --sub-bg: rgba(0,0,0,0.25);
             --sub-border: rgba(255,255,255,0.08);
@@ -45,7 +45,7 @@
             
             --color-free: #10b981;
             --color-booked: #ef4444;
-            --color-pending: #f59e0b;
+            --color-rejected: #94a3b8; /* เทาสว่าง (ไม่อนุมัติ) */
 
             --sub-bg: rgba(0,0,0,0.03);
             --sub-border: rgba(0,0,0,0.08);
@@ -95,12 +95,13 @@
         .month-dropdown { font-size: 18px; font-weight: 500; color: var(--primary); text-align: center; background: transparent; border: none; font-family: 'Kanit', sans-serif; cursor: pointer; outline: none; min-width: 180px; padding: 5px 10px; -webkit-appearance: none; appearance: none; transition: 0.3s;}
         .month-dropdown option { background: var(--bg-base); color: var(--text-main); }
 
+        /* 🔥 นำสถานะ รอตรวจสอบ (Pending) ออกจาก Legend */
         .status-legend { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; padding: 8px 15px; background: var(--sub-bg); border: 1px solid var(--sub-border); border-radius: 10px; transition: 0.3s;}
         .legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-muted); font-weight: 400; transition: 0.3s;}
         .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; transition: 0.3s;}
         .dot-free { background: var(--color-free); box-shadow: 0 0 8px var(--color-free); }
-        .dot-pending { background: var(--color-pending); box-shadow: 0 0 8px var(--color-pending); }
         .dot-booked { background: var(--color-booked); box-shadow: 0 0 8px var(--color-booked); }
+        .dot-rejected { background: var(--color-rejected); box-shadow: 0 0 8px var(--color-rejected); }
 
         .calendar-grid { display: grid; grid-template-columns: 0.5fr 1fr 1fr 1fr 1fr 1fr 0.5fr; gap: 8px; flex-grow: 1; align-content: stretch; overflow: hidden; }
         
@@ -122,24 +123,23 @@
         .slots-container { display: flex; flex-direction: column; gap: 6px; width: 100%; margin-top: auto; overflow-y: auto; scrollbar-width: none;}
         .slots-container::-webkit-scrollbar { display: none; }
         
-        /* 🔥 รูปแบบใหม่: Solid Fill + SVG Icons 🔥 */
         .slot-badge { 
             display: flex; align-items: center; justify-content: center; gap: 6px;
             font-size: 12px; font-weight: 500; padding: 6px 4px; border-radius: 6px; 
             width: 100%; box-sizing: border-box; color: #fff;
-            white-space: normal; /* ยอมให้ขึ้นบรรทัดใหม่ */
-            word-wrap: break-word; /* ตัดคำถ้าไม่มีที่ */
+            white-space: normal; 
+            word-wrap: break-word; 
             line-height: 1.2;
             text-align: center;
             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
             transition: 0.3s;
         }
         .slot-badge svg { width: 14px; height: 14px; flex-shrink: 0; }
-        .slot-text { flex-shrink: 1; } /* ยืดหยุ่นได้เมื่อพื้นที่แคบ */
+        .slot-text { flex-shrink: 1; } 
 
-        .slot-free { background: linear-gradient(135deg, #10b981, #059669); }
-        .slot-booked { background: linear-gradient(135deg, #f43f5e, #e11d48); }
-        .slot-pending { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .slot-free { background: linear-gradient(135deg, var(--color-free), #059669); }
+        .slot-booked { background: linear-gradient(135deg, var(--color-booked), #e11d48); }
+        .slot-rejected { background: linear-gradient(135deg, var(--color-rejected), #475569); }
 
         /* BUTTONS & INPUTS */
         .btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border-radius: 10px; border: none; font-family: 'Kanit'; font-weight: 500; cursor: pointer; transition: all 0.2s; font-size: 15px; flex-shrink: 0; outline: none; width: 100%; }
@@ -162,7 +162,7 @@
 
         .detail-item { background: var(--sub-bg); border: 1px solid var(--sub-border); padding: 15px; border-radius: 12px; margin-bottom: 12px; border-left: 4px solid var(--color-free); transition: 0.3s; word-wrap: break-word; }
         .detail-item.booked { border-left-color: var(--color-booked); }
-        .detail-item.pending { border-left-color: var(--color-pending); }
+        .detail-item.rejected { border-left-color: var(--color-rejected); opacity: 0.8; }
         .detail-meta { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; flex-wrap: wrap; gap: 5px; }
 
         .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; max-width: 90vw; }
@@ -187,7 +187,6 @@
             .day-card { padding: 8px 6px; min-height: 110px; height: auto;}
             .day-num { font-size: 16px; }
             
-            /* ปรับ Slot บน iPad */
             .slot-badge { font-size: 11px; padding: 4px 2px; gap: 4px; }
             .slot-badge svg { width: 12px; height: 12px; }
         }
@@ -218,7 +217,6 @@
             .day-num { font-size: 13px; margin-bottom: 2px; text-align: center;}
             .slots-container { gap: 4px; }
             
-            /* ปรับ Slot บนมือถือจิ๋ว (ป้องกันข้อความตกหล่น) */
             .slot-badge { font-size: 10px; padding: 3px 1px; gap: 2px; border-radius: 4px; }
             .slot-badge svg { width: 10px; height: 10px; }
             
@@ -282,8 +280,8 @@
             </div>
             <div class="status-legend">
                 <div class="legend-item"><span class="legend-dot dot-free"></span> ว่าง</div>
-                <div class="legend-item"><span class="legend-dot dot-pending"></span> รอตรวจสอบ</div>
                 <div class="legend-item"><span class="legend-dot dot-booked"></span> จองแล้ว</div>
+                <div class="legend-item"><span class="legend-dot dot-rejected"></span> ไม่อนุมัติ</div>
             </div>
         </div>
         
@@ -339,10 +337,10 @@
 <div id="adminDashModal" class="modal">
     <div class="modal-content" style="max-width: 600px;">
         <h3 style="color: var(--primary); margin-top: 0; border-bottom: 1px solid var(--panel-border); padding-bottom:15px;">🛡️ ADMIN DASHBOARD</h3>
-        <div style="color: var(--text-muted); margin-bottom: 10px; font-size: 13px;">รายการจองรอตรวจสอบ (Pending)</div>
+        <div style="color: var(--text-muted); margin-bottom: 10px; font-size: 13px;">รายการจองทั้งหมด (Active Bookings)</div>
         <div id="pendingListContainer" style="max-height: 45vh; overflow-y: auto; padding-right: 5px;"></div>
         <div style="display: flex; gap: 10px; margin-top: 20px; border-top: 1px solid var(--panel-border); padding-top:15px;">
-            <button class="btn btn-outline" style="color: var(--color-booked); border-color: var(--color-booked); flex: 1;" onclick="logoutAdmin()">ออกจากระบบ</button>
+            <button class="btn btn-outline" style="color: var(--color-rejected); border-color: var(--color-rejected); flex: 1;" onclick="logoutAdmin()">ออกจากระบบ</button>
             <button class="btn btn-primary" style="flex: 2;" onclick="closeModal('adminDashModal')">ปิด</button>
         </div>
     </div>
@@ -372,7 +370,6 @@
     const MAX_MONTH_OFFSET = 11; 
     const adminAccounts = { 'admin1': 'gnr3admin', 'admin2': 'gnr3admin', 'admin3': 'gnr3admin' };
 
-    // ✨ ระบบ Theme กลางวัน/กลางคืน
     function initTheme() {
         const savedTheme = localStorage.getItem('theme') || 'dark';
         document.documentElement.setAttribute('data-theme', savedTheme);
@@ -420,24 +417,41 @@
         const container = document.getElementById('toastContainer');
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
-        let icon = type === 'success' ? '<svg viewBox="0 0 24 24" style="fill:var(--color-free)"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>' : type === 'error' ? '<svg viewBox="0 0 24 24" style="fill:var(--color-booked)"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>' : '<svg viewBox="0 0 24 24" style="fill:var(--color-pending)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>';
+        let icon = type === 'success' ? '<svg viewBox="0 0 24 24" style="fill:var(--color-free)"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>' : type === 'error' ? '<svg viewBox="0 0 24 24" style="fill:var(--color-booked)"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>' : '<svg viewBox="0 0 24 24" style="fill:var(--color-rejected)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>';
         toast.innerHTML = `${icon} <span style="color:var(--text-main);">${msg}</span>`;
         container.appendChild(toast);
         setTimeout(() => toast.classList.add('show'), 10);
         setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 3500);
     }
 
+    // 🔥 ระบบวิเคราะห์สถานะแบบมีลำดับความสำคัญ (Priority) เพื่อทับสถานะเดิมให้ถูกต้อง
     function analyzeSlot(dayData) {
-        let am = { status: 'free', class: 'slot-free' };
-        let pm = { status: 'free', class: 'slot-free' };
+        let am = { status: 'free', class: 'slot-free', priority: 0 };
+        let pm = { status: 'free', class: 'slot-free', priority: 0 };
+        
+        // ให้ลำดับความสำคัญ: จองแล้ว(3) > ไม่อนุมัติ(1) > ว่าง(0) (ยุบสถานะ pending รวมเข้ากับ approved เผื่อมีข้อมูลเก่าตกค้าง)
+        const getPriority = (status) => (status === 'approved' || status === 'pending') ? 3 : status === 'rejected' ? 1 : 0;
+        const getClass = (status) => (status === 'approved' || status === 'pending') ? 'slot-booked' : status === 'rejected' ? 'slot-rejected' : 'slot-free';
+
         dayData.forEach(b => {
-            if (b.Status === 'rejected' || b.Status === 'cancelled') return;
+            if (b.Status === 'cancelled') return; // Cancel = ล้างทิ้งให้ว่างเลย
+            
             const startH = parseInt(b['Start Time']?.split(':')[0] || 0);
             const stopH = parseInt(b['StopTime']?.split(':')[0] || 0);
-            const sClass = b.Status === 'approved' ? 'slot-booked' : 'slot-pending';
-            if (startH <= 8 && stopH >= 18) { am.class = sClass; pm.class = sClass; } 
-            else if (startH < 12) { am.class = sClass; } 
-            else if (startH >= 12) { pm.class = sClass; } 
+            
+            const prio = getPriority(b.Status);
+            const sClass = getClass(b.Status);
+            
+            if (startH <= 8 && stopH >= 18) { 
+                if(prio >= am.priority) { am.class = sClass; am.priority = prio; }
+                if(prio >= pm.priority) { pm.class = sClass; pm.priority = prio; }
+            } 
+            else if (startH < 12) { 
+                if(prio >= am.priority) { am.class = sClass; am.priority = prio; }
+            } 
+            else if (startH >= 12) { 
+                if(prio >= pm.priority) { pm.class = sClass; pm.priority = prio; }
+            } 
         });
         return { am, pm };
     }
@@ -502,11 +516,12 @@
                 card.innerHTML = `<div class="day-num" style="color: ${holidayName ? '#f87171' : 'var(--text-muted)'}">${i}</div>${label}`;
                 card.onclick = () => showToast(`❌ ไม่อนุญาตให้จอง: ${holidayName ? holidayName : 'ปิดให้บริการ'}`, 'error');
             } else {
-                const dayData = bookings.filter(b => b.Date && b.Date.split('T')[0] === dateStr && b.Status !== 'rejected' && b.Status !== 'cancelled');
+                // ซ่อนเฉพาะรายการที่ Cancelled (ส่วนรายการ Rejected จะยังคงแสดงให้เห็นเป็นสีเทา)
+                const dayData = bookings.filter(b => b.Date && b.Date.split('T')[0] === dateStr && b.Status !== 'cancelled');
                 const slots = analyzeSlot(dayData);
                 card.className = `day-card ${isTodayClass}`;
                 
-                // HTML ของช่องสถานะแบบ A (Solid Fill + SVG)
+                // รูปแบบแสดงผล Solid Fill + SVG
                 card.innerHTML = `
                     <div class="day-num">${i}</div>
                     <div class="slots-container">
@@ -576,23 +591,28 @@
         const thaiDate = new Date(dateStr).toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric' });
         document.getElementById('dayModalTitle').innerHTML = `<svg viewBox="0 0 24 24" style="width:20px; fill:currentColor;"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg> ${thaiDate}`;
         
-        const displayData = isAdmin ? rawDayData : rawDayData.filter(b => b.Status !== 'rejected' && b.Status !== 'cancelled');
+        // กรองการแสดงผล: ไม่แสดงรายการ Cancel แต่แสดงรายการ Rejected
+        const displayData = isAdmin ? rawDayData : rawDayData.filter(b => b.Status !== 'cancelled');
 
         if (displayData.length === 0) {
             container.innerHTML = `<div style="text-align:center; padding: 40px 20px;"><div style="color:var(--text-muted); margin-bottom:15px; font-size:15px;">ไม่มีคิวการใช้งานในวันนี้</div><button class="btn btn-primary" onclick="openBookingWithDate('${dateStr}')" style="margin: 0 auto; width: auto;"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg> สร้างคิวจองใหม่</button></div>`;
         } else {
             container.innerHTML = '';
             displayData.sort((a,b) => (a['Start Time']||"").localeCompare(b['Start Time']||"")).forEach(b => {
-                const statusColor = (b.Status === 'approved') ? 'booked' : (b.Status === 'pending' ? 'pending' : 'free');
-                const statusText = b.Status === 'approved' ? '<span style="color:var(--color-booked);">อนุมัติแล้ว</span>' : b.Status === 'pending' ? '<span style="color:var(--color-pending);">รอตรวจสอบ</span>' : `<span style="color:var(--text-muted); text-decoration: line-through;">ยกเลิกแล้ว</span>`;
+                const statusColor = (b.Status === 'approved' || b.Status === 'pending') ? 'booked' : (b.Status === 'rejected' ? 'rejected' : 'free');
+                const statusText = (b.Status === 'approved' || b.Status === 'pending') ? '<span style="color:var(--color-booked);">อนุมัติแล้ว</span>' : b.Status === 'rejected' ? '<span style="color:var(--color-rejected);">ไม่อนุมัติ</span>' : `<span style="color:var(--text-muted); text-decoration: line-through;">ยกเลิกแล้ว</span>`;
                 const detailHtml = (b.Detail && b.Detail !== "-" && b.Detail.trim() !== "") ? `<div style="color:var(--text-muted); font-size:13px; margin-bottom:8px; background: var(--bg-base); padding: 8px 10px; border-radius: 6px; border-left: 3px solid var(--primary);">📝 ${b.Detail}</div>` : '';
 
+                // โหมด Admin จะแสดงแค่ปุ่ม Reject และ Cancel
                 let adminBtns = '';
                 if (isAdmin) {
-                    adminBtns = `<div class="admin-action-btns" style="margin-top: 15px; display:flex; gap:8px;"><button class="btn btn-outline" style="flex:1; color:var(--color-free); border-color:var(--color-free); padding:8px; font-size:12px;" onclick="updateStatus('${b.ID}', 'approved')">Approve</button><button class="btn btn-outline" style="flex:1; color:var(--color-pending); border-color:var(--color-pending); padding:8px; font-size:12px;" onclick="updateStatus('${b.ID}', 'rejected')">Reject</button><button class="btn btn-outline" style="flex:1; color:var(--color-booked); border-color:var(--color-booked); padding:8px; font-size:12px;" onclick="updateStatus('${b.ID}', 'cancelled')">Cancel</button></div>`;
+                    adminBtns = `<div class="admin-action-btns" style="margin-top: 15px; display:flex; gap:8px;">
+                        <button class="btn btn-outline" style="flex:1; color:var(--color-rejected); border-color:var(--color-rejected); padding:8px; font-size:12px;" onclick="updateStatus('${b.ID}', 'rejected')">Reject (ไม่อนุมัติ)</button>
+                        <button class="btn btn-outline" style="flex:1; color:var(--color-booked); border-color:var(--color-booked); padding:8px; font-size:12px;" onclick="updateStatus('${b.ID}', 'cancelled')">Cancel (ลบทิ้ง)</button>
+                    </div>`;
                 }
 
-                container.innerHTML += `<div class="detail-item ${statusColor}" style="${(b.Status==='cancelled'||b.Status==='rejected')?'opacity:0.5':''}"><div class="detail-meta"><strong style="color:var(--primary); font-size:15px;">⏰ ${b['Start Time']} - ${b.StopTime}</strong><span style="font-size:14px">${statusText}</span></div><div style="color:var(--text-main); font-size: 16px; font-weight:500; margin-bottom:6px;">${b.Subject}</div>${detailHtml}<div style="color:var(--text-muted); font-size:13px;">👤 ${b.User} | 📞 ${(b.Phone||"").replace(/'/g,'')}</div>${adminBtns}</div>`;
+                container.innerHTML += `<div class="detail-item ${statusColor}" style="${b.Status==='cancelled'?'opacity:0.5':''}"><div class="detail-meta"><strong style="color:var(--primary); font-size:15px;">⏰ ${b['Start Time']} - ${b.StopTime}</strong><span style="font-size:14px">${statusText}</span></div><div style="color:var(--text-main); font-size: 16px; font-weight:500; margin-bottom:6px;">${b.Subject}</div>${detailHtml}<div style="color:var(--text-muted); font-size:13px;">👤 ${b.User} | 📞 ${(b.Phone||"").replace(/'/g,'')}</div>${adminBtns}</div>`;
             });
             container.innerHTML += `<div style="text-align:center; padding-top: 10px;"><button class="btn btn-outline" style="width:100%; border-style: dashed;" onclick="openBookingWithDate('${dateStr}')">+ จองคิวเวลาอื่นเพิ่มเติม</button></div>`;
         }
@@ -614,7 +634,8 @@
         let st = "08:00", ed = "12:00";
         if (slot === 'afternoon') { st = "13:00"; ed = "18:00"; } else if (slot === 'fullday') { st = "08:00"; ed = "18:00"; }
 
-        const data = { action: 'create', Date: inputDate, startTime: st, stopTime: ed, subject: document.getElementById('formSubject').value, detail: document.getElementById('formDetail').value || "-", user: document.getElementById('formUser').value, phone: document.getElementById('formPhone').value };
+        // แอบส่งสถานะ 'approved' ไปด้วยเผื่อฝั่งหลังบ้านรองรับการรับค่าโดยตรง
+        const data = { action: 'create', Date: inputDate, startTime: st, stopTime: ed, subject: document.getElementById('formSubject').value, detail: document.getElementById('formDetail').value || "-", user: document.getElementById('formUser').value, phone: document.getElementById('formPhone').value, status: 'approved' };
 
         if (!data.Date || !data.subject || !data.user) { showToast("โปรดกรอกข้อมูลให้ครบถ้วน", "warning"); return; }
         btn.innerText = "กำลังบันทึก..."; btn.disabled = true;
@@ -623,7 +644,7 @@
             const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(data) });
             const result = await res.json();
             if (result.status === 'error') showToast(result.msg, "error");
-            else { showToast("✅ บันทึกข้อมูลเสร็จแล้ว!", "success"); document.getElementById('formDetail').value = ''; closeModal('bookingModal'); syncDataSilently(false); }
+            else { showToast("✅ บันทึกและอนุมัติคิวเรียบร้อยแล้ว!", "success"); document.getElementById('formDetail').value = ''; closeModal('bookingModal'); syncDataSilently(false); }
         } catch (e) { showToast("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้", "error"); } finally { btn.innerText = "ยืนยัน"; btn.disabled = false; }
     }
 
@@ -664,18 +685,33 @@
 
     function renderAdminDashboard() {
         const container = document.getElementById('pendingListContainer');
-        const pending = bookings.filter(b => b.Status === 'pending');
-        if (pending.length === 0) { container.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:40px;">✅ ไม่มีรายการรออนุมัติ</div>'; return; }
+        // 🔥 ดึงรายการที่ "จองแล้ว (approved/pending)" ทั้งหมดมาแสดงให้แอดมินดู แทนของเดิมที่ดูแค่ pending
+        const activeBookings = bookings.filter(b => b.Status === 'approved' || b.Status === 'pending');
+        
+        if (activeBookings.length === 0) { container.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:40px;">✅ ไม่มีรายการจองในระบบ</div>'; return; }
         container.innerHTML = '';
-        pending.sort((a,b) => new Date(a.Date) - new Date(b.Date)).forEach(b => {
+        activeBookings.sort((a,b) => new Date(a.Date) - new Date(b.Date)).forEach(b => {
             const dateFmt = b.Date ? b.Date.split('T')[0] : '';
             const detailHtml = (b.Detail && b.Detail !== "-" && b.Detail.trim() !== "") ? `<div style="color:var(--text-muted); font-size:13px; margin-bottom:8px; background: var(--bg-base); padding: 8px 10px; border-radius: 6px; border-left: 3px solid var(--primary);">📝 ${b.Detail}</div>` : '';
-            container.innerHTML += `<div class="detail-item pending" style="margin-bottom: 15px;"><div class="detail-meta"><strong style="color:var(--primary); font-size:15px;">📅 ${dateFmt} | ⏰ ${b['Start Time']} - ${b.StopTime}</strong></div><div style="color:var(--text-main); font-size:16px; font-weight:500; margin-bottom:6px;">${b.Subject}</div>${detailHtml}<div style="color:var(--text-muted); font-size:13px;">👤 ผู้จอง: ${b.User} | 📞 ${(b.Phone||"").replace(/'/g,'')}</div><div class="admin-action-btns" style="margin-top: 15px; display:flex; gap:10px;"><button class="btn btn-outline" style="flex:1; color:var(--color-free); border-color:var(--color-free); padding:8px; font-size:13px;" onclick="updateStatus('${b.ID}', 'approved')">Approve</button><button class="btn btn-outline" style="flex:1; color:var(--color-pending); border-color:var(--color-pending); padding:8px; font-size:13px;" onclick="updateStatus('${b.ID}', 'rejected')">Reject</button><button class="btn btn-outline" style="flex:1; color:var(--color-booked); border-color:var(--color-booked); padding:8px; font-size:13px;" onclick="updateStatus('${b.ID}', 'cancelled')">Cancel</button></div></div>`;
+            
+            container.innerHTML += `<div class="detail-item booked" style="margin-bottom: 15px;">
+                <div class="detail-meta">
+                    <strong style="color:var(--primary); font-size:15px;">📅 ${dateFmt} | ⏰ ${b['Start Time']} - ${b.StopTime}</strong>
+                </div>
+                <div style="color:var(--text-main); font-size:16px; font-weight:500; margin-bottom:6px;">${b.Subject}</div>
+                ${detailHtml}
+                <div style="color:var(--text-muted); font-size:13px;">👤 ผู้จอง: ${b.User} | 📞 ${(b.Phone||"").replace(/'/g,'')}</div>
+                
+                <div class="admin-action-btns" style="margin-top: 15px; display:flex; gap:10px;">
+                    <button class="btn btn-outline" style="flex:1; color:var(--color-rejected); border-color:var(--color-rejected); padding:8px; font-size:13px;" onclick="updateStatus('${b.ID}', 'rejected')">Reject (ไม่อนุมัติ)</button>
+                    <button class="btn btn-outline" style="flex:1; color:var(--color-booked); border-color:var(--color-booked); padding:8px; font-size:13px;" onclick="updateStatus('${b.ID}', 'cancelled')">Cancel (ลบทิ้ง)</button>
+                </div>
+            </div>`;
         });
     }
 
     async function updateStatus(id, status) {
-        let msg = status === 'approved' ? 'อนุมัติ' : status === 'rejected' ? 'ปฏิเสธ' : 'ยกเลิก';
+        let msg = status === 'rejected' ? 'ปฏิเสธ' : 'ยกเลิก (ลบทิ้ง)';
         if(!confirm(`ยืนยันที่จะ ${msg} รายการนี้?`)) return;
         closeModal('dayDetailsModal'); 
         showToast(`กำลัง ${msg}...`, "warning");
